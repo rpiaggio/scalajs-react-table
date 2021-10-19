@@ -47,11 +47,11 @@ import scalajs.js.JSConverters._
 case class TableDefWithOptions[
   D,
   TableOptsD <: UseTableOptions[D],
-  TableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
+  TableInstanceD[d, co, col, row, cell[d0, v], s] <: TableInstance[d, co, col, row, cell, s],
   ColumnOptsD <: ColumnOptions[D],
   ColumnObjectD <: ColumnObject[D],
   RowD <: Row[D],
-  CellD <: Cell[D, js.Any],
+  CellD[d, v] <: Cell[d, v],
   TableStateD <: TableState[D],
   Layout
 ](
@@ -74,20 +74,21 @@ case class TableDefWithOptions[
 case class TableDef[
   D,
   TableOptsD <: UseTableOptions[D],
-  TableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
+  TableInstanceD[d, co, col, row, cell[d0, v], s] <: TableInstance[d, co, col, row, cell, s],
   ColumnOptsD <: ColumnOptions[D],
   ColumnObjectD <: ColumnObject[D],
   RowD <: Row[D],
-  CellD <: Cell[D, js.Any],
+  CellD[d, v] <: Cell[d, v],
   TableStateD <: TableState[D],
   Layout
 ](plugins: Set[Plugin]) {
   type OptionsType       = TableOptsD
-  type InstanceType      = TableInstanceD[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD]
+  type InstanceType      =
+    TableInstanceD[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD]
   type ColumnOptionsType = ColumnOptsD
   type ColumnType        = ColumnObjectD
   type RowType           = RowD
-  type CellType          = CellD
+  type CellType[V]       = CellD[D, V]
   type StateType         = TableStateD
 
   import syntax._
@@ -185,11 +186,11 @@ case class TableDef[
 
   protected[reactST] def withFeaturePlugin[
     NewTableOptsD <: UseTableOptions[D],
-    NewTableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
+    NewTableInstanceD[d, co, col, row, cell[d0, v], s] <: TableInstance[d, co, col, row, cell, s],
     NewColumnOptsD <: ColumnOptions[D],
     NewColumnObjectD <: ColumnObject[D],
     NewRowD <: Row[D],
-    NewCellD <: Cell[D, js.Any],
+    NewCellD[d, v] <: Cell[d, v],
     NewTableStateD <: TableState[D]
   ](plugin: Plugin) =
     TableDef[D,
@@ -394,7 +395,7 @@ object TableDef {
     ColumnOptions[D],
     ColumnObject[D],
     Row[D],
-    Cell[D, js.Any],
+    Cell,
     TableState[D],
     Layout.Table
   ] = TableDef[
@@ -404,7 +405,7 @@ object TableDef {
     ColumnOptions[D],
     ColumnObject[D],
     Row[D],
-    Cell[D, js.Any],
+    Cell,
     TableState[D],
     Layout.Table
   ](Set.empty)// format: on
@@ -415,11 +416,11 @@ object TableDef {
   // format: off
   implicit class TableLayoutTableDefOps[D,
       TableOptsD <: UseTableOptions[D],
-      TableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
+      TableInstanceD[d, co, col, row, cell[d0, v], s] <: TableInstance[d, co, col, row, cell, s],
       ColumnOptsD <: ColumnOptions[D],
       ColumnObjectD <: ColumnObject[D],
       RowD <: Row[D],
-      CellD <: Cell[D, js.Any],
+      CellD[d, v] <: Cell[d, v],
       TableStateD <: TableState[D],
     ] (val tableDef: TableDef[D, 
           TableOptsD, 
@@ -432,11 +433,11 @@ object TableDef {
           Layout.Table]) extends AnyVal { // format: on
     private def withLayoutPlugin[
       NewTableOptsD <: UseTableOptions[D],
-      NewTableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
+      NewTableInstanceD[d, co, col, row, cell[d0, v], s] <: TableInstance[d, co, col, row, cell, s],
       NewColumnOptsD <: ColumnOptions[D],
       NewColumnObjectD <: ColumnObject[D],
       NewRowD <: Row[D],
-      NewCellD <: Cell[D, js.Any],
+      NewCellD[d, v] <: Cell[d, v],
       NewState <: TableState[D]
     ](plugin: Plugin) =
       TableDef[D,
@@ -491,11 +492,11 @@ object TableDef {
 
   implicit class NonTableLayoutTableDefOps[D, 
     TableOptsD <: UseTableOptions[D], 
-    TableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
+    TableInstanceD[d, co, col, row, cell[d0, v], s] <: TableInstance[d, co, col, row, cell, s],
     ColumnOptsD <: ColumnOptions[D], 
     ColumnObjectD <: ColumnObject[D], 
     RowD <: Row[D],
-    CellD <: Cell[D, js.Any],
+    CellD[d, v] <: Cell[d, v],
     TableStateD <: TableState[D],
   ]( // format: on
     val tableDef: TableDef[

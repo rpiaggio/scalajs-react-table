@@ -48,11 +48,11 @@ object HTMLTable {
    */
   def apply[
     D, // format: off
-    TableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
+    TableInstanceD[d, co, col, row, cell[d0, v], s] <: TableInstance[d, co, col, row, cell, s],
     ColumnOptsD <: ColumnOptions[D],
     ColumnObjectD <: ColumnObject[D],
     RowD <: Row[D],
-    CellD <: Cell[D, js.Any],
+    CellD[d0, v] <: Cell[d0, v],
     TableStateD <: TableState[D] // format: on
   ](
     tableDef: TableDef[D,
@@ -132,11 +132,11 @@ object HTMLTable {
    */
   def virtualized[
     D, // format: off
-    TableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
+    TableInstanceD[d, co, col, row, cell[d0, v], s] <: TableInstance[d, co, col, row, cell, s],
     ColumnOptsD <: ColumnOptions[D],
     ColumnObjectD <: ColumnObject[D],
     RowD <: Row[D],
-    CellD <: Cell[D, js.Any],
+    CellD[d0, v] <: Cell[d0, v],
     TableStateD <: TableState[D] // format: on
   ](
     tableDef:     TableDef[D,

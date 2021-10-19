@@ -3,11 +3,11 @@ package reactST
 import reactST.reactTable.mod._
 
 package object reactTable extends HooksApiExt {
-  type TableInstance[d, co, col, row, cell, s]            =
+  type TableInstance[d, co, col, row, cell[d0, v], s]            =
     facade.tableInstance.TableInstance[d, co, col, row, cell, s]
-  type UseSortByTableInstance[d, co, col, row, cell, s]   =
+  type UseSortByTableInstance[d, co, col, row, cell[d0, v], s]   =
     facade.tableInstance.UseSortByTableInstance[d, co, col, row, cell, s]
-  type UseExpandedTableInstance[d, co, col, row, cell, s] =
+  type UseExpandedTableInstance[d, co, col, row, cell[d0, v], s] =
     facade.tableInstance.UseExpandedTableInstance[d, co, col, row, cell, s]
 
   type ColumnOptions[D]                                  =

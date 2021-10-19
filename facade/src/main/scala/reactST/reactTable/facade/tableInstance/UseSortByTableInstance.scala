@@ -6,7 +6,7 @@ import reactST.reactTable.mod.SortingRule
 import scala.scalajs.js
 
 @js.native
-trait UseSortByTableInstance[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD]
+trait UseSortByTableInstance[D, ColumnOptsD, ColumnObjectD, RowD, CellD[d, v], TableStateD]
     extends TableInstance[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD] {
 
   var preSortedRows: js.Array[RowD] = js.native
