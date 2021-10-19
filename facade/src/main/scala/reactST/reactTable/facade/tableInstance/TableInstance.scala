@@ -1,4 +1,4 @@
-package reactST.reactTable
+package reactST.reactTable.facade.tableInstance
 
 import reactST.reactTable.anon.PartialTableToggleHideAll
 import reactST.reactTable.mod._
@@ -11,8 +11,7 @@ import scalajs.js
 // to add specific typing. Ideally we would extend and override, but we
 // cannot override vars in Scala (and everything's a var in the generated code).
 @js.native
-trait TableInstanceTyped[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD]
-    extends js.Object {
+trait TableInstance[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD] extends js.Object {
   val allColumns: js.Array[ColumnObjectD] = js.native
 
   val allColumnsHidden: Boolean = js.native
@@ -84,7 +83,7 @@ trait TableInstanceTyped[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD
       /* action */ ActionType,
       /* previousState */ TableStateD,
       /* instance */ js.UndefOr[
-        TableInstanceTyped[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD]
+        TableInstance[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD]
       ],
       TableState[D]
     ]

@@ -2,7 +2,10 @@ package reactST.reactTable
 
 import japgolly.scalajs.react._
 import reactST.reactTable._
-import reactST.reactTable.mod._
+import reactST.reactTable.mod.Row
+import reactST.reactTable.mod.Cell
+import reactST.reactTable.mod.TableState
+import reactST.reactTable.mod.UseTableOptions
 
 import scalajs.js
 
@@ -12,7 +15,7 @@ object HooksApiExt {
     final def useTable[
       D,
       TableOptsD <: UseTableOptions[D],
-      TableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
+      TableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
       ColumnOptsD <: ColumnOptions[D],
       ColumnObjectD <: ColumnObject[D],
       RowD <: Row[D],
@@ -41,7 +44,7 @@ object HooksApiExt {
     final def useTableBy[
       D,
       TableOptsD <: UseTableOptions[D],
-      TableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
+      TableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
       ColumnOptsD <: ColumnOptions[D],
       ColumnObjectD <: ColumnObject[D],
       RowD <: Row[D],
@@ -75,7 +78,7 @@ object HooksApiExt {
     def useTableBy[
       D,
       TableOptsD <: UseTableOptions[D],
-      TableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
+      TableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
       ColumnOptsD <: ColumnOptions[D],
       ColumnObjectD <: ColumnObject[D],
       RowD <: Row[D],

@@ -2,7 +2,12 @@ package reactST.reactTable
 
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.hooks.CustomHook
-import reactST.reactTable.mod._
+import reactST.reactTable.mod.Row
+import reactST.reactTable.mod.Cell
+import reactST.reactTable.mod.TableState
+import reactST.reactTable.mod.UseTableOptions
+import reactST.reactTable.mod.PluginHook
+import reactST.reactTable.mod.TableOptions
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSBracketAccess
@@ -19,7 +24,7 @@ object TableHooks {
   @js.native
   def useTableJS[
     D, // format: off
-    TableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
+    TableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
     ColumnOptsD, 
     ColumnObjectD, 
     RowD, 
@@ -38,7 +43,7 @@ object TableHooks {
   def useTableHook[
     D,
     TableOptsD <: UseTableOptions[D],
-    TableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
+    TableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
     ColumnOptsD <: ColumnOptions[D],
     ColumnObjectD <: ColumnObject[D],
     RowD <: Row[D],

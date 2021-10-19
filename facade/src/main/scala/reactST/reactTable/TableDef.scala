@@ -13,7 +13,31 @@ import reactST.reactTable.anon.IdIdType
 import reactST.reactTable.anon.IdIdType._
 import reactST.reactTable.anon.`1`._
 import reactST.reactTable.mod.ColumnInterfaceBasedOnValue._
-import reactST.reactTable.mod.{ ^ => _, _ }
+import reactST.reactTable.mod.UseTableOptions
+import reactST.reactTable.mod.Row
+import reactST.reactTable.mod.Cell
+import reactST.reactTable.mod.TableState
+import reactST.reactTable.mod.ColumnInterface
+import reactST.reactTable.mod.Column
+import reactST.reactTable.mod.ColumnGroup
+import reactST.reactTable.mod.UseSortByColumnOptions
+import reactST.reactTable.mod.UseSortByColumnProps
+import reactST.reactTable.mod.UseSortByOptions
+import reactST.reactTable.mod.UseSortByState
+import reactST.reactTable.mod.UseExpandedOptions
+import reactST.reactTable.mod.UseExpandedInstanceProps
+import reactST.reactTable.mod.UseExpandedRowProps
+import reactST.reactTable.mod.UseExpandedState
+import reactST.reactTable.mod.SortByFn
+import reactST.reactTable.mod.ColumnInterfaceBasedOnValue
+import reactST.reactTable.mod.CellProps
+import reactST.reactTable.mod.Renderer
+import reactST.reactTable.mod.CellValue
+import reactST.reactTable.mod.HeaderGroup
+import reactST.reactTable.mod.UseResizeColumnsState
+import reactST.reactTable.mod.UseResizeColumnsColumnOptions
+import reactST.reactTable.mod.UseResizeColumnsColumnProps
+import reactST.reactTable.mod.UseResizeColumnsOptions
 import reactST.std.Partial
 
 import scalajs.js
@@ -23,7 +47,7 @@ import scalajs.js.JSConverters._
 case class TableDefWithOptions[
   D,
   TableOptsD <: UseTableOptions[D],
-  TableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
+  TableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
   ColumnOptsD <: ColumnOptions[D],
   ColumnObjectD <: ColumnObject[D],
   RowD <: Row[D],
@@ -50,7 +74,7 @@ case class TableDefWithOptions[
 case class TableDef[
   D,
   TableOptsD <: UseTableOptions[D],
-  TableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
+  TableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
   ColumnOptsD <: ColumnOptions[D],
   ColumnObjectD <: ColumnObject[D],
   RowD <: Row[D],
@@ -161,7 +185,7 @@ case class TableDef[
 
   protected[reactST] def withFeaturePlugin[
     NewTableOptsD <: UseTableOptions[D],
-    NewTableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
+    NewTableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
     NewColumnOptsD <: ColumnOptions[D],
     NewColumnObjectD <: ColumnObject[D],
     NewRowD <: Row[D],
@@ -184,7 +208,7 @@ case class TableDef[
    */
   def withSort = withFeaturePlugin[
     TableOptsD with UseSortByOptions[D],
-    TableInstanceD with UseExpandedInstanceTyped,
+    TableInstanceD with UseExpandedTableInstance,
     ColumnOptsD with UseSortByColumnOptions[D],
     ColumnObjectD with UseSortByColumnProps[D],
     RowD,
@@ -366,7 +390,7 @@ object TableDef {
   def apply[D]: TableDef[ // format: off
     D,
     UseTableOptions[D],
-    TableInstanceTyped,
+    TableInstance,
     ColumnOptions[D],
     ColumnObject[D],
     Row[D],
@@ -376,7 +400,7 @@ object TableDef {
   ] = TableDef[
     D,
     UseTableOptions[D],
-    TableInstanceTyped,
+    TableInstance,
     ColumnOptions[D],
     ColumnObject[D],
     Row[D],
@@ -391,7 +415,7 @@ object TableDef {
   // format: off
   implicit class TableLayoutTableDefOps[D,
       TableOptsD <: UseTableOptions[D],
-      TableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
+      TableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
       ColumnOptsD <: ColumnOptions[D],
       ColumnObjectD <: ColumnObject[D],
       RowD <: Row[D],
@@ -408,7 +432,7 @@ object TableDef {
           Layout.Table]) extends AnyVal { // format: on
     private def withLayoutPlugin[
       NewTableOptsD <: UseTableOptions[D],
-      NewTableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
+      NewTableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
       NewColumnOptsD <: ColumnOptions[D],
       NewColumnObjectD <: ColumnObject[D],
       NewRowD <: Row[D],
@@ -467,7 +491,7 @@ object TableDef {
 
   implicit class NonTableLayoutTableDefOps[D, 
     TableOptsD <: UseTableOptions[D], 
-    TableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
+    TableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
     ColumnOptsD <: ColumnOptions[D], 
     ColumnObjectD <: ColumnObject[D], 
     RowD <: Row[D],

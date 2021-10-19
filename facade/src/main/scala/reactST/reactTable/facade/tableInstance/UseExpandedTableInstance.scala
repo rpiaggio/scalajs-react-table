@@ -1,12 +1,12 @@
-package reactST.reactTable
+package reactST.reactTable.facade.tableInstance
 
-import reactST.reactTable.mod._
+import reactST.reactTable.mod.IdType
 
 import scala.scalajs.js
 
 @js.native
-trait UseExpandedInstanceTyped[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD]
-    extends TableInstanceTyped[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD] {
+trait UseExpandedTableInstance[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD]
+    extends TableInstance[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD] {
 
   var expandedDepth: Double = js.native
 

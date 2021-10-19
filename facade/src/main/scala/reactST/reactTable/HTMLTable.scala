@@ -7,9 +7,12 @@ import react.common.Css
 import react.virtuoso.Virtuoso
 import reactST.reactTable.anon.Data
 import reactST.reactTable.mod.ColumnInterfaceBasedOnValue._
-import reactST.reactTable.mod.{ ^ => _, _ }
-import reactST.reactTable.syntax._
+import reactST.reactTable.mod.Row
+import reactST.reactTable.mod.Cell
+import reactST.reactTable.mod.TableState
+import reactST.reactTable.mod.UseSortByColumnProps
 import reactST.reactTable.util._
+import reactST.reactTable.syntax._
 import reactST.std.Partial
 
 import scalajs.js
@@ -45,7 +48,7 @@ object HTMLTable {
    */
   def apply[
     D, // format: off
-    TableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
+    TableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
     ColumnOptsD <: ColumnOptions[D],
     ColumnObjectD <: ColumnObject[D],
     RowD <: Row[D],
@@ -129,7 +132,7 @@ object HTMLTable {
    */
   def virtualized[
     D, // format: off
-    TableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
+    TableInstanceD[d, co, col, row, cell, s] <: TableInstance[d, co, col, row, cell, s],
     ColumnOptsD <: ColumnOptions[D],
     ColumnObjectD <: ColumnObject[D],
     RowD <: Row[D],
