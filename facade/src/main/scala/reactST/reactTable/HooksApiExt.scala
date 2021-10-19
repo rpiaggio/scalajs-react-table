@@ -1,7 +1,10 @@
 package reactST.reactTable
 
 import japgolly.scalajs.react._
+import reactST.reactTable._
 import reactST.reactTable.mod._
+
+import scalajs.js
 
 object HooksApiExt {
   sealed class Primary[Ctx, Step <: HooksApi.AbstractStep](api: HooksApi.Primary[Ctx, Step]) {
@@ -9,47 +12,59 @@ object HooksApiExt {
     final def useTable[
       D,
       TableOptsD <: UseTableOptions[D],
-      TableInstanceD <: TableInstance[D],
       ColumnOptsD <: ColumnOptions[D],
       ColumnObjectD <: ColumnObject[D],
+      RowD <: Row[D],
+      CellD <: Cell[D, js.Any],
       TableStateD <: TableState[D],
+      TableInstanceD[_, _, _, _, _, _] <: TableInstanceTyped[_, _, _, _, _, _],
       Layout
     ](
       tableDefWithOptions: TableDefWithOptions[
         D,
         TableOptsD,
-        TableInstanceD,
         ColumnOptsD,
         ColumnObjectD,
+        RowD,
+        CellD,
         TableStateD,
+        TableInstanceD,
         Layout
       ]
     )(implicit
       step:                Step
-    ): step.Next[Reusable[TableInstanceD]] =
+    ): step.Next[Reusable[
+      TableInstanceD[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD]
+    ]] =
       useTableBy(_ => tableDefWithOptions)
 
     final def useTableBy[
       D,
       TableOptsD <: UseTableOptions[D],
-      TableInstanceD <: TableInstance[D],
       ColumnOptsD <: ColumnOptions[D],
       ColumnObjectD <: ColumnObject[D],
+      RowD <: Row[D],
+      CellD <: Cell[D, js.Any],
       TableStateD <: TableState[D],
+      TableInstanceD[_, _, _, _, _, _] <: TableInstanceTyped[_, _, _, _, _, _],
       Layout
     ](
       tableDefWithOptions: Ctx => TableDefWithOptions[
         D,
         TableOptsD,
-        TableInstanceD,
         ColumnOptsD,
         ColumnObjectD,
+        RowD,
+        CellD,
         TableStateD,
+        TableInstanceD,
         Layout
       ]
     )(implicit
       step:                Step
-    ): step.Next[Reusable[TableInstanceD]] =
+    ): step.Next[Reusable[
+      TableInstanceD[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD]
+    ]] =
       api.customBy(ctx => TableHooks.useTableHook(tableDefWithOptions(ctx)))
   }
 
@@ -60,24 +75,30 @@ object HooksApiExt {
     def useTableBy[
       D,
       TableOptsD <: UseTableOptions[D],
-      TableInstanceD <: TableInstance[D],
       ColumnOptsD <: ColumnOptions[D],
       ColumnObjectD <: ColumnObject[D],
+      RowD <: Row[D],
+      CellD <: Cell[D, js.Any],
       TableStateD <: TableState[D],
+      TableInstanceD[_, _, _, _, _, _] <: TableInstanceTyped[_, _, _, _, _, _],
       Layout
     ](
       tableDefWithOptions: CtxFn[TableDefWithOptions[
         D,
         TableOptsD,
-        TableInstanceD,
         ColumnOptsD,
         ColumnObjectD,
+        RowD,
+        CellD,
         TableStateD,
+        TableInstanceD,
         Layout
       ]]
     )(implicit
       step:                Step
-    ): step.Next[Reusable[TableInstanceD]] =
+    ): step.Next[Reusable[
+      TableInstanceD[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD]
+    ]] =
       super.useTableBy(step.squash(tableDefWithOptions)(_))
 
   }

@@ -44,15 +44,26 @@ object HTMLTable {
    *     span multiple columns and react-table does not support that. At some point, something
    *     similar for an "extra" header row might be useful since header groups have some issues.
    */
-  def apply[D, TableInstanceD <: TableInstance[D], ColumnObjectD <: ColumnObject[D]](
-    tableDef:     TableDef[D, _, TableInstanceD, _, ColumnObjectD, _, _] // Only used to infer types
+  def apply[D, ColumnObjectD <: ColumnObject[D], RowD <: Row[
+    D
+  ], TableInstanceD[_, _, _, _ <: RowD, _, _] <: TableInstanceTyped[_, _, _, RowD, _, _]](
+    tableDef: TableDef[D,
+                       _,
+                       _,
+                       ColumnObjectD,
+                       RowD,
+                       _,
+                       _,
+                       TableInstanceD,
+                       _
+    ] // Only used to infer types
   )(
     headerCellFn: Option[ColumnObjectD => TagMod],
     tableClass:   Css = Css(""),
     rowClassFn:   (Int, D) => Css = (_: Int, _: D) => Css(""),
     footer:       TagMod = TagMod.empty
   ) =
-    ScalaFnComponent[TableInstanceD] { tableInstance =>
+    ScalaFnComponent[TableInstanceD[D, _, ColumnObjectD, RowD, _, _]] { tableInstance =>
       val bodyProps = tableInstance.getTableBodyProps()
 
       val header = headerCellFn.fold(TagMod.empty) { f =>
@@ -110,8 +121,10 @@ object HTMLTable {
    *     or the body will collapse to nothing. In CSS, you MUST NOT use relative values like "100%"
    *     or it won't work.
    */
-  def virtualized[D, TableInstanceD <: TableInstance[D], ColumnObjectD <: ColumnObject[D]](
-    tableDef:     TableDef[D, _, TableInstanceD, _, ColumnObjectD, _, Layout.NonTable]
+  def virtualized[D, ColumnObjectD <: ColumnObject[D], RowD <: Row[
+    D
+  ], TableInstanceD <: TableInstanceTyped[D, _, ColumnObjectD, RowD, _, _]](
+    tableDef:     TableDef[D, _, _, ColumnObjectD, _, _, _, TableInstanceD, Layout.NonTable]
   )(
     bodyHeight:   Option[Double] = None,
     headerCellFn: Option[ColumnObjectD => TagMod],
@@ -148,7 +161,7 @@ object HTMLTable {
       }
 
       val height = bodyHeight.fold(TagMod.empty)(h => ^.height := s"${h}px")
-      val rows   = Virtuoso[Row[D]](data = tableInstance.rows, itemContent = rowComp)
+      val rows   = Virtuoso[RowD](data = tableInstance.rows, itemContent = rowComp)
 
       <.div(^.className := "table",
             tableClass,

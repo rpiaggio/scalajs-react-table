@@ -58,7 +58,7 @@ inThisBuild(
   )
 )
 
-val root        =
+val root =
   project
     .in(file("."))
     .aggregate(facade, demo)
@@ -72,7 +72,7 @@ val root        =
       Keys.`package`  := file("")
     )
 
-lazy val demo   =
+lazy val demo =
   project
     .in(file("demo"))
     .enablePlugins(ScalaJSBundlerPlugin)
@@ -180,6 +180,7 @@ lazy val facade =
           "-Xlint:nullary-unit"
         )
       )),
+      scalacOptions ~= (_.filterNot(Set("-Vtype-diffs"))),
       // Some Scalablytyped generated Scaladocs are malformed.
       // Workaround: https://github.com/xerial/sbt-sonatype/issues/30#issuecomment-342532067
       Compile / doc / sources                             := Seq(),

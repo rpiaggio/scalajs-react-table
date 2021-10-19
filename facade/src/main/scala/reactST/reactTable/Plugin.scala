@@ -9,6 +9,7 @@ sealed abstract class Plugin(val hook: TableHook) extends Ordered[Plugin] {
 
 object Plugin {
   final case object SortBy        extends Plugin(useSortBy)
+  final case object Expanded      extends Plugin(useExpanded)
   final case object ResizeColumns extends Plugin(useResizeColumns)
   final case object BlockLayout   extends Plugin(useBlockLayout)
   final case object GridLayout    extends Plugin(useGridLayout)

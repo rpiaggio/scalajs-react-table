@@ -17,7 +17,17 @@ import scalajs.js.JSConverters._
 object TableHooks {
   @JSImport("react-table", "useTable")
   @js.native
-  def useTableJS[D, TI <: TableInstance[D]](options: TableOptions[D], plugins: PluginHook[D]*): TI =
+  def useTableJS[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD, TI[
+    _,
+    _,
+    _,
+    _,
+    _,
+    _
+  ] <: TableInstanceTyped[_, _, _, _, _, _]](
+    options: TableOptions[D],
+    plugins: PluginHook[D]*
+  ): TI[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD] =
     js.native
 
   // According to documentation, react-table memoizes the table state.
@@ -27,20 +37,24 @@ object TableHooks {
   def useTableHook[
     D,
     TableOptsD <: UseTableOptions[D],
-    TableInstanceD <: TableInstance[D],
     ColumnOptsD <: ColumnOptions[D],
     ColumnObjectD <: ColumnObject[D],
+    RowD <: Row[D],
+    CellD <: Cell[D, js.Any],
     TableStateD <: TableState[D],
+    TableInstanceD[_, _, _, _, _, _] <: TableInstanceTyped[_, _, _, _, _, _],
     Layout
   ] =
     CustomHook[
       TableDefWithOptions[
         D,
         TableOptsD,
-        TableInstanceD,
         ColumnOptsD,
         ColumnObjectD,
+        RowD,
+        CellD,
         TableStateD,
+        TableInstanceD,
         Layout
       ]
     ]
@@ -48,13 +62,14 @@ object TableHooks {
       .useMemoBy(_.input.data)(_ => _.toJSArray)
       .buildReturning { (props, cols, rows) =>
         val tableInstance =
-          useTableJS[D, TableInstanceD](
+          useTableJS[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD, TableInstanceD](
             props.modOpts(props.tableDef.Options(cols, rows)),
             props.tableDef.plugins.toList.sorted.map(_.hook: PluginHook[D]): _*
           )
         Reusable
-          .implicitly((cols, rows, props.modOpts, tableInstance.state))
-          .withValue(tableInstance)
+          // .implicitly((cols, rows, props.modOpts, tableInstance.state))
+          // .withValue(tableInstance)
+          .never(tableInstance)
       }
 
   sealed trait TableHook extends js.Object
@@ -65,6 +80,10 @@ object TableHooks {
   @JSImport("react-table", "useSortBy")
   @js.native
   object useSortBy extends TableHook
+
+  @JSImport("react-table", "useExpanded")
+  @js.native
+  object useExpanded extends TableHook
 
   @JSImport("react-table", "useBlockLayout")
   @js.native
