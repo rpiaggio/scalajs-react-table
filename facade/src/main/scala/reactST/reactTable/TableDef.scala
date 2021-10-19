@@ -19,7 +19,6 @@ import reactST.std.Partial
 import scalajs.js
 import scalajs.js.|
 import scalajs.js.JSConverters._
-import javax.sql.RowSetMetaData
 
 case class TableDefWithOptions[
   D,
@@ -374,7 +373,7 @@ object TableDef {
     Cell[D, js.Any],
     TableState[D],
     Layout.Table
-  ] = TableDef[ // format: off
+  ] = TableDef[
     D,
     UseTableOptions[D],
     TableInstanceTyped,

@@ -15,7 +15,6 @@ import reactST.std.Partial
 import scalajs.js
 import scalajs.js.|
 import scalajs.js.JSConverters._
-// import reactTableStrings._
 
 object HTMLTable {
 

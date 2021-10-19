@@ -13,6 +13,4 @@ package object reactTable extends HooksApiExt {
     Col with ColumnInterfaceBasedOnValue[D, V]
   type ColumnGroupOptions[D]                             = ColumnGroup[D] with ColumnFooter[D]
   type ColumnObject[D]                                   = ColumnInstance[D] with UseTableColumnFooter[D]
-
-  // type TableInstanceTypedD[D][A1] = TableInstanceTyped[D, A1]
 }
