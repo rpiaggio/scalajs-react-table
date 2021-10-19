@@ -24,30 +24,23 @@ import javax.sql.RowSetMetaData
 case class TableDefWithOptions[
   D,
   TableOptsD <: UseTableOptions[D],
+  TableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
   ColumnOptsD <: ColumnOptions[D],
   ColumnObjectD <: ColumnObject[D],
   RowD <: Row[D],
   CellD <: Cell[D, js.Any],
   TableStateD <: TableState[D],
-  TableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S],
-  // TableInstanceD[_, _, _, _, _, _] <: TableInstanceTyped[D,
-  //                                                        ColumnOptsD,
-  //                                                        ColumnObjectD,
-  //                                                        RowD,
-  //                                                        CellD,
-  //                                                        TableStateD
-  // ],
   Layout
 ](
   tableDef: TableDef[
     D,
     TableOptsD,
+    TableInstanceD,
     ColumnOptsD,
     ColumnObjectD,
     RowD,
     CellD,
     TableStateD,
-    TableInstanceD,
     Layout
   ],
   cols:     Reusable[List[ColumnInterface[D]]],
@@ -58,12 +51,12 @@ case class TableDefWithOptions[
 case class TableDef[
   D,
   TableOptsD <: UseTableOptions[D],
+  TableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
   ColumnOptsD <: ColumnOptions[D],
   ColumnObjectD <: ColumnObject[D],
   RowD <: Row[D],
   CellD <: Cell[D, js.Any],
   TableStateD <: TableState[D],
-  TableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S],
   Layout
 ](plugins: Set[Plugin]) {
   type OptionsType       = TableOptsD
@@ -83,12 +76,12 @@ case class TableDef[
   ): TableDefWithOptions[
     D,
     TableOptsD,
+    TableInstanceD,
     ColumnOptsD,
     ColumnObjectD,
     RowD,
     CellD,
     TableStateD,
-    TableInstanceD,
     Layout
   ] =
     TableDefWithOptions(this, cols, data, modOpts)
@@ -169,21 +162,21 @@ case class TableDef[
 
   protected[reactST] def withFeaturePlugin[
     NewTableOptsD <: UseTableOptions[D],
+    NewTableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
     NewColumnOptsD <: ColumnOptions[D],
     NewColumnObjectD <: ColumnObject[D],
     NewRowD <: Row[D],
     NewCellD <: Cell[D, js.Any],
-    NewTableStateD <: TableState[D],
-    NewTableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S]
+    NewTableStateD <: TableState[D]
   ](plugin: Plugin) =
     TableDef[D,
              NewTableOptsD,
+             NewTableInstanceD,
              NewColumnOptsD,
              NewColumnObjectD,
              NewRowD,
              NewCellD,
              NewTableStateD,
-             NewTableInstanceD,
              Layout
     ](plugins + plugin)
 
@@ -192,21 +185,12 @@ case class TableDef[
    */
   def withSort = withFeaturePlugin[
     TableOptsD with UseSortByOptions[D],
+    TableInstanceD with UseSortByInstanceTyped, // TODO Test if results in correct type at usage site.
     ColumnOptsD with UseSortByColumnOptions[D],
     ColumnObjectD with UseSortByColumnProps[D],
     RowD,
     CellD,
-    TableStateD with UseSortByState[D],
-    TableInstanceD
-    // TableInstanceTyped.With[D,
-    //                         ColumnOptsD with UseSortByColumnOptions[D],
-    //                         ColumnObjectD with UseSortByColumnProps[D],
-    //                         RowD,
-    //                         CellD,
-    //                         TableStateD with UseSortByState[D],
-    //                         TableInstanceD
-    // ] with UseSortByInstanceTyped[D, RowD]
-    // TableInstanceD with UseSortByInstanceTyped //[D, RowD]
+    TableStateD with UseSortByState[D]
   ](Plugin.SortBy)
 
   /**
@@ -214,12 +198,12 @@ case class TableDef[
    */
   def withExpanded = withFeaturePlugin[
     TableOptsD with UseExpandedOptions[D],
+    TableInstanceD with UseExpandedInstanceProps,
     ColumnOptsD,
     ColumnObjectD,
     RowD with UseExpandedRowProps[D],
     CellD,
-    TableStateD with UseExpandedState[D],
-    TableInstanceD with UseExpandedInstanceProps, //[D],
+    TableStateD with UseExpandedState[D]
   ](Plugin.Expanded)
 
   // When trying to use a more traditional "syntax" package and implicit
@@ -383,22 +367,22 @@ object TableDef {
   def apply[D]: TableDef[ // format: off
     D,
     UseTableOptions[D],
+    TableInstanceTyped,
     ColumnOptions[D],
     ColumnObject[D],
     Row[D],
     Cell[D, js.Any],
     TableState[D],
-    TableInstanceTyped,
     Layout.Table
   ] = TableDef[ // format: off
     D,
     UseTableOptions[D],
+    TableInstanceTyped,
     ColumnOptions[D],
     ColumnObject[D],
     Row[D],
     Cell[D, js.Any],
     TableState[D],
-    TableInstanceTyped,
     Layout.Table
   ](Set.empty)// format: on
 
@@ -408,38 +392,38 @@ object TableDef {
   // format: off
   implicit class TableLayoutTableDefOps[D,
       TableOptsD <: UseTableOptions[D],
+      TableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
       ColumnOptsD <: ColumnOptions[D],
       ColumnObjectD <: ColumnObject[D],
       RowD <: Row[D],
       CellD <: Cell[D, js.Any],
       TableStateD <: TableState[D],
-      TableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S],
     ] (val tableDef: TableDef[D, 
           TableOptsD, 
+          TableInstanceD,
           ColumnOptsD,
           ColumnObjectD,
           RowD,
           CellD,
           TableStateD,
-          TableInstanceD,
           Layout.Table]) extends AnyVal { // format: on
     private def withLayoutPlugin[
       NewTableOptsD <: UseTableOptions[D],
+      NewTableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
       NewColumnOptsD <: ColumnOptions[D],
       NewColumnObjectD <: ColumnObject[D],
       NewRowD <: Row[D],
       NewCellD <: Cell[D, js.Any],
-      NewState <: TableState[D],
-      NewTableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S]
+      NewState <: TableState[D]
     ](plugin: Plugin) =
       TableDef[D,
                NewTableOptsD,
+               NewTableInstanceD,
                NewColumnOptsD,
                NewColumnObjectD,
                NewRowD,
                NewCellD,
                NewState,
-               NewTableInstanceD,
                Layout.NonTable
       ](tableDef.plugins + plugin)
 
@@ -454,12 +438,12 @@ object TableDef {
      */
     def withBlockLayout = withLayoutPlugin[
       TableOptsD,
+      TableInstanceD,
       ColumnOptsD,
       ColumnObjectD,
       RowD,
       CellD,
       TableStateD,
-      TableInstanceD,
     ](Plugin.BlockLayout)
 
     /**
@@ -471,12 +455,12 @@ object TableDef {
      */
     def withGridLayout = withLayoutPlugin[
       TableOptsD,
+      TableInstanceD,
       ColumnOptsD,
       ColumnObjectD,
       RowD,
       CellD,
       TableStateD,
-      TableInstanceD
     ](Plugin.GridLayout)
   }
 
@@ -484,22 +468,22 @@ object TableDef {
 
   implicit class NonTableLayoutTableDefOps[D, 
     TableOptsD <: UseTableOptions[D], 
+    TableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
     ColumnOptsD <: ColumnOptions[D], 
     ColumnObjectD <: ColumnObject[D], 
     RowD <: Row[D],
     CellD <: Cell[D, js.Any],
     TableStateD <: TableState[D],
-    TableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S]
   ]( // format: on
     val tableDef: TableDef[
       D,
       TableOptsD,
+      TableInstanceD,
       ColumnOptsD,
       ColumnObjectD,
       RowD,
       CellD,
       TableStateD,
-      TableInstanceD,
       Layout.NonTable
     ]
   ) extends AnyVal {
@@ -509,12 +493,12 @@ object TableDef {
      */
     def withResizeColumns = tableDef.withFeaturePlugin[
       TableOptsD with UseResizeColumnsOptions[D],
+      TableInstanceD,
       ColumnOptsD with UseResizeColumnsColumnOptions[D],
       ColumnObjectD with UseResizeColumnsColumnProps[D],
       RowD,
       CellD,
       TableStateD with UseResizeColumnsState[D],
-      TableInstanceD,
     ](Plugin.ResizeColumns)
   }
   // format: on

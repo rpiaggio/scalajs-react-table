@@ -19,12 +19,12 @@ object TableHooks {
   @js.native
   def useTableJS[
     D, // format: off
+    TableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
     ColumnOptsD, 
     ColumnObjectD, 
     RowD, 
     CellD, 
     TableStateD, 
-    TableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S]
   ]( // format: on
     options: TableOptions[D],
     plugins: PluginHook[D]*
@@ -38,24 +38,24 @@ object TableHooks {
   def useTableHook[
     D,
     TableOptsD <: UseTableOptions[D],
+    TableInstanceD[d, co, col, row, cell, s] <: TableInstanceTyped[d, co, col, row, cell, s],
     ColumnOptsD <: ColumnOptions[D],
     ColumnObjectD <: ColumnObject[D],
     RowD <: Row[D],
     CellD <: Cell[D, js.Any],
     TableStateD <: TableState[D],
-    TableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S],
     Layout
   ] =
     CustomHook[
       TableDefWithOptions[
         D,
         TableOptsD,
+        TableInstanceD,
         ColumnOptsD,
         ColumnObjectD,
         RowD,
         CellD,
         TableStateD,
-        TableInstanceD,
         Layout
       ]
     ]
@@ -63,7 +63,7 @@ object TableHooks {
       .useMemoBy(_.input.data)(_ => _.toJSArray)
       .buildReturning { (props, cols, rows) =>
         val tableInstance =
-          useTableJS[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD, TableInstanceD](
+          useTableJS[D, TableInstanceD, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD](
             props.modOpts(props.tableDef.Options(cols, rows)),
             props.tableDef.plugins.toList.sorted.map(_.hook: PluginHook[D]): _*
           )
