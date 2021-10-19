@@ -96,7 +96,7 @@ trait TableInstanceTyped[D,
 
   val plugins: js.Array[PluginHook[D]] = js.native
 
-  def prepareRow(row: Row[D]): Unit = js.native
+  def prepareRow(row: RowD): Unit = js.native
 
   val rows: js.Array[RowD] = js.native
 

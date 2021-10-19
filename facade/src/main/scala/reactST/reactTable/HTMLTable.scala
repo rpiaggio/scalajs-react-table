@@ -46,7 +46,7 @@ object HTMLTable {
    */
   def apply[D, ColumnObjectD <: ColumnObject[D], RowD <: Row[
     D
-  ], TableInstanceD[_, _, _, _ <: RowD, _, _] <: TableInstanceTyped[_, _, _, RowD, _, _]](
+  ], TableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S]](
     tableDef: TableDef[D,
                        _,
                        _,
@@ -123,7 +123,7 @@ object HTMLTable {
    */
   def virtualized[D, ColumnObjectD <: ColumnObject[D], RowD <: Row[
     D
-  ], TableInstanceD <: TableInstanceTyped[D, _, ColumnObjectD, RowD, _, _]](
+  ], TableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S]](
     tableDef:     TableDef[D, _, _, ColumnObjectD, _, _, _, TableInstanceD, Layout.NonTable]
   )(
     bodyHeight:   Option[Double] = None,
@@ -131,10 +131,10 @@ object HTMLTable {
     tableClass:   Css = Css(""),
     rowClassFn:   (Int, D) => Css = (_: Int, _: D) => Css("")
   ) =
-    ScalaFnComponent[TableInstanceD] { tableInstance =>
+    ScalaFnComponent[TableInstanceD[D, _, ColumnObjectD, RowD, _, _]] { tableInstance =>
       val bodyProps = tableInstance.getTableBodyProps()
 
-      val rowComp = (_: Int, row: Row[D]) => {
+      val rowComp = (_: Int, row: RowD) => {
         tableInstance.prepareRow(row)
         val cells = row.cells.toTagMod { cell =>
           <.div(^.className := "td", props2Attrs(cell.getCellProps()), cell.renderCell)

@@ -17,17 +17,18 @@ import scalajs.js.JSConverters._
 object TableHooks {
   @JSImport("react-table", "useTable")
   @js.native
-  def useTableJS[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD, TI[
-    _,
-    _,
-    _,
-    _,
-    _,
-    _
-  ] <: TableInstanceTyped[_, _, _, _, _, _]](
+  def useTableJS[
+    D, // format: off
+    ColumnOptsD, 
+    ColumnObjectD, 
+    RowD, 
+    CellD, 
+    TableStateD, 
+    TableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S]
+  ]( // format: on
     options: TableOptions[D],
     plugins: PluginHook[D]*
-  ): TI[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD] =
+  ): TableInstanceD[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD] =
     js.native
 
   // According to documentation, react-table memoizes the table state.
@@ -42,7 +43,7 @@ object TableHooks {
     RowD <: Row[D],
     CellD <: Cell[D, js.Any],
     TableStateD <: TableState[D],
-    TableInstanceD[_, _, _, _, _, _] <: TableInstanceTyped[_, _, _, _, _, _],
+    TableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S],
     Layout
   ] =
     CustomHook[
@@ -67,9 +68,8 @@ object TableHooks {
             props.tableDef.plugins.toList.sorted.map(_.hook: PluginHook[D]): _*
           )
         Reusable
-          // .implicitly((cols, rows, props.modOpts, tableInstance.state))
-          // .withValue(tableInstance)
-          .never(tableInstance)
+          .implicitly((cols, rows, props.modOpts, tableInstance.state))
+          .withValue(tableInstance)
       }
 
   sealed trait TableHook extends js.Object

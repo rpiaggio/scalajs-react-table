@@ -29,7 +29,14 @@ case class TableDefWithOptions[
   RowD <: Row[D],
   CellD <: Cell[D, js.Any],
   TableStateD <: TableState[D],
-  TableInstanceD[_, _ /*<: ColumnOptsD*/, _, _, _, _] <: TableInstanceTyped[_, _, _, _, _, _],
+  TableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S],
+  // TableInstanceD[_, _, _, _, _, _] <: TableInstanceTyped[D,
+  //                                                        ColumnOptsD,
+  //                                                        ColumnObjectD,
+  //                                                        RowD,
+  //                                                        CellD,
+  //                                                        TableStateD
+  // ],
   Layout
 ](
   tableDef: TableDef[
@@ -56,7 +63,7 @@ case class TableDef[
   RowD <: Row[D],
   CellD <: Cell[D, js.Any],
   TableStateD <: TableState[D],
-  TableInstanceD[_, _, _, _, _, _] <: TableInstanceTyped[_, _, _, _, _, _],
+  TableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S],
   Layout
 ](plugins: Set[Plugin]) {
   type OptionsType       = TableOptsD
@@ -167,7 +174,7 @@ case class TableDef[
     NewRowD <: Row[D],
     NewCellD <: Cell[D, js.Any],
     NewTableStateD <: TableState[D],
-    NewTableInstanceD[_, _, _, _, _, _] <: TableInstanceTyped[_, _, _, _, _, _]
+    NewTableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S]
   ](plugin: Plugin) =
     TableDef[D,
              NewTableOptsD,
@@ -190,15 +197,16 @@ case class TableDef[
     RowD,
     CellD,
     TableStateD with UseSortByState[D],
+    TableInstanceD
     // TableInstanceTyped.With[D,
-    //                         TableInstanceD,
     //                         ColumnOptsD with UseSortByColumnOptions[D],
     //                         ColumnObjectD with UseSortByColumnProps[D],
     //                         RowD,
     //                         CellD,
     //                         TableStateD with UseSortByState[D],
-    // ]
-    TableInstanceD with UseSortByInstanceTyped //[D, RowD]
+    //                         TableInstanceD
+    // ] with UseSortByInstanceTyped[D, RowD]
+    // TableInstanceD with UseSortByInstanceTyped //[D, RowD]
   ](Plugin.SortBy)
 
   /**
@@ -405,7 +413,7 @@ object TableDef {
       RowD <: Row[D],
       CellD <: Cell[D, js.Any],
       TableStateD <: TableState[D],
-      TableInstanceD[_, _, _, _, _, _] <: TableInstanceTyped[_, _, _, _, _, _],
+      TableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S],
     ] (val tableDef: TableDef[D, 
           TableOptsD, 
           ColumnOptsD,
@@ -422,7 +430,7 @@ object TableDef {
       NewRowD <: Row[D],
       NewCellD <: Cell[D, js.Any],
       NewState <: TableState[D],
-      NewTableInstanceD[_, _, _, _, _, _] <: TableInstanceTyped[_, _, _, _, _, _]
+      NewTableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S]
     ](plugin: Plugin) =
       TableDef[D,
                NewTableOptsD,
@@ -481,7 +489,7 @@ object TableDef {
     RowD <: Row[D],
     CellD <: Cell[D, js.Any],
     TableStateD <: TableState[D],
-    TableInstanceD[_, _, _, _, _, _] <: TableInstanceTyped[_, _, _, _, _, _], 
+    TableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S]
   ]( // format: on
     val tableDef: TableDef[
       D,

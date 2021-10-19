@@ -17,7 +17,7 @@ object HooksApiExt {
       RowD <: Row[D],
       CellD <: Cell[D, js.Any],
       TableStateD <: TableState[D],
-      TableInstanceD[_, _, _, _, _, _] <: TableInstanceTyped[_, _, _, _, _, _],
+      TableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S],
       Layout
     ](
       tableDefWithOptions: TableDefWithOptions[
@@ -46,7 +46,7 @@ object HooksApiExt {
       RowD <: Row[D],
       CellD <: Cell[D, js.Any],
       TableStateD <: TableState[D],
-      TableInstanceD[_, _, _, _, _, _] <: TableInstanceTyped[_, _, _, _, _, _],
+      TableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S],
       Layout
     ](
       tableDefWithOptions: Ctx => TableDefWithOptions[
@@ -80,7 +80,7 @@ object HooksApiExt {
       RowD <: Row[D],
       CellD <: Cell[D, js.Any],
       TableStateD <: TableState[D],
-      TableInstanceD[_, _, _, _, _, _] <: TableInstanceTyped[_, _, _, _, _, _],
+      TableInstanceD[D0, CO, CI, RI, C, S] <: TableInstanceTyped[D0, CO, CI, RI, C, S],
       Layout
     ](
       tableDefWithOptions: CtxFn[TableDefWithOptions[
