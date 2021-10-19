@@ -184,7 +184,7 @@ case class TableDef[
    */
   def withSort = withFeaturePlugin[
     TableOptsD with UseSortByOptions[D],
-    TableInstanceD with UseSortByInstanceTyped,
+    TableInstanceD with UseExpandedInstanceTyped,
     ColumnOptsD with UseSortByColumnOptions[D],
     ColumnObjectD with UseSortByColumnProps[D],
     RowD,
