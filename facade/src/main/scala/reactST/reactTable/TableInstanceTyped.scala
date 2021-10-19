@@ -7,27 +7,6 @@ import reactST.std.Record
 
 import scalajs.js
 
-object TableInstanceTyped {
-  // format: off
-  type With[D, 
-    ColumnOptsD <: ColumnOptions[D], 
-    ColumnObjectD <: ColumnObject[D], 
-    RowD <: Row[D],
-    CellD <: Cell[D, js.Any],
-    TableStateD <: TableState[D],
-    TableInstanceTypedD[_,_, _, _, _, _] <: TableInstanceTyped[_, _, _,_, _, _], //<: TableInstanceTyped[D, COD, CID, RD, CD, SD],
-  ] = 
-    TableInstanceTypedD[
-      D,
-      ColumnOptsD, 
-      ColumnObjectD,
-      RowD,
-      CellD,
-      TableStateD
-    ]
-  // format: on
-}
-
 // Copied from package reactST.reactTable.mod.TableInstance and modified
 // to add specific typing. Ideally we would extend and override, but we
 // cannot override vars in Scala (and everything's a var in the generated code).
