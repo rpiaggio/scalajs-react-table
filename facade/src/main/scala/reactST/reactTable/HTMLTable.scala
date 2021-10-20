@@ -51,8 +51,8 @@ object HTMLTable {
   def apply[
     D, // format: off
     TableOptsD <: UseTableOptions[D],
-    TableInstanceType[d, col, row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
-    ColumnOptsType[d, v, col, row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
+    TableInstanceType[d, col, row, cell[d0, v0], s] <: TableInstance[d, col, row, cell, s],
+    ColumnOptsType[d, v, col, row, cell[d0, v0], s] <: ColumnOptions[d, v, col, row, cell, s],
     ColumnD <: Column[D],
     RowD <: Row[D],
     CellType[d, v] <: Cell[d, v],
@@ -137,23 +137,26 @@ object HTMLTable {
   def virtualized[
     D, // format: off
     TableOptsD <: UseTableOptions[D],
-    TableInstanceType[d, col, row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
-    ColumnOptsType[d, v, col, row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
+    TableInstanceType[d, col, row, cell[d0, v0], s] <: TableInstance[d, col, row, cell, s],
+    ColumnOptsType[d, v, col, row, cell[d0, v0], s] <: ColumnOptions[d, v, col, row, cell, s],
     ColumnD <: Column[D],
     RowD <: Row[D],
     CellType[d, v] <: Cell[d, v],
-    TableStateD <: TableState[D] // format: on
+    TableStateD <: TableState[D],
+    Self
+     // format: on
   ](
-    tableDef: TableDef[D,
-                       TableOptsD,
-                       TableInstanceType,
-                       ColumnOptsType,
-                       ColumnD,
-                       RowD,
-                       CellType,
-                       TableStateD,
-                       Layout.NonTable
-    ] // Only used to infer types
+    tableDef: Self
+      with TableDef[D,
+                    TableOptsD,
+                    TableInstanceType,
+                    ColumnOptsType,
+                    ColumnD,
+                    RowD,
+                    CellType,
+                    TableStateD,
+                    Layout.NonTable
+      ] // Only used to infer types
   )(
     bodyHeight:   Option[Double] = None,
     headerCellFn: Option[ColumnD => TagMod],

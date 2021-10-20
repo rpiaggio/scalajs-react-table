@@ -167,7 +167,18 @@ object DemoMain {
   )
 
   // Table 4
-  val SortedVariableVirtualizedTableDef = TableDef[RandomData.Person].withSortBy.withBlockLayout
+  val SortedVariableVirtualizedTableDef =
+    TableDef[RandomData.Person].withSortBy.withBlockLayout.withResizeColumns
+
+// D,
+//      TableOptsD <: UseTableOptions[D],
+//      TableInstanceType[d, col, row, cell[d0, v0], s] <: TableInstance[d, col, row, cell, s],
+//      ColumnOptsType[d, v, col, row, cell[d0, v0], s] <: ColumnOptions[d, v, col, row, cell, s],
+//      ColumnD <: Column[D],
+//      RowD <: Row[D],
+//      CellType[d, v] <: Cell[d, v],
+//      TableStateD <: TableState[D],
+//      Layout
 
   val SortedVariableVirtualizedTable =
     ScalaFnComponent
@@ -176,7 +187,16 @@ object DemoMain {
          Reusable[List[RandomData.Person]]
         )
       ]
-      .useTableBy { case (cols, data) => SortedVariableVirtualizedTableDef(cols, data) }
+      .useTableBy[RandomData.Person,
+                  SortedVariableVirtualizedTableDef.Type.Options,
+                  SortedVariableVirtualizedTableDef.Type.InstanceC,
+                  SortedVariableVirtualizedTableDef.Type.ColumnOptionsC,
+                  SortedVariableVirtualizedTableDef.Type.Column,
+                  SortedVariableVirtualizedTableDef.Type.Row,
+                  SortedVariableVirtualizedTableDef.Type.CellC,
+                  SortedVariableVirtualizedTableDef.Type.TableState,
+                  Layout.NonTable
+      ] { case (cols, data) => SortedVariableVirtualizedTableDef(cols, data) }
       .render((_, tableInstance) =>
         HTMLTable.virtualized(SortedVariableVirtualizedTableDef)(
           tableClass = Css("virtualized"),

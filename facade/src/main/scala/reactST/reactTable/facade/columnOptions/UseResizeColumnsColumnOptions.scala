@@ -27,8 +27,8 @@ object UseResizeColumnsColumnOptions {
     RowD,
     CellType[d, v],
     TableStateD,
-    ColumnOptsType[d, v, col, row, cell[d0, v], s] <: 
-    UseResizeColumnsColumnOptions[d, v, col, row, cell, s] // format: on
+    ColumnOptsType[d, v, col, row, cell[d0, v0], s] <: 
+      UseResizeColumnsColumnOptions[d, v, col, row, cell, s] // format: on
   ](val x: ColumnOptsType[D, V, ColumnD, RowD, CellType, TableStateD])
       extends AnyVal {
     type Self = ColumnOptsType[D, V, ColumnD, RowD, CellType, TableStateD]

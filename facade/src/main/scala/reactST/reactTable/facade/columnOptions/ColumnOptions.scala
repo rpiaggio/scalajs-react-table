@@ -102,11 +102,8 @@ object ColumnOptions {
     CellType[d, v],
     TableStateD,
     Self
-    // ColumnOptsType[d, v, col[d0], row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s]
-    // Self <: ColumnOptions[D, V, ColumnType, RowType, CellType, StateType] // format: on
   ](val colOpts: Self with ColumnOptions[D, V, ColumnD, RowD, CellType, TableStateD])
       extends AnyVal {
-    // type Self = ColumnOptsType[D, V, ColumnType, RowType, CellType, StateType]
 
     @scala.inline
     def setHeader(value: js.UndefOr[Renderer[HeaderProps[D]]]): Self = {
