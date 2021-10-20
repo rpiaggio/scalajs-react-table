@@ -18,6 +18,7 @@ import reactST.std.Partial
 import scalajs.js
 import scalajs.js.|
 import scalajs.js.JSConverters._
+import reactST.reactTable.mod.UseTableOptions
 
 object HTMLTable {
 
@@ -49,21 +50,24 @@ object HTMLTable {
    */
   def apply[
     D, // format: off
+    TableOptsD <: UseTableOptions[D],
     TableInstanceType[d, col[d0], row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
+    ColumnOptsType[d, v, col[d0], row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
     ColumnType[d] <: Column[d],
     RowD <: Row[D],
     CellType[d, v] <: Cell[d, v],
-    TableStateD <: TableState[D] // format: on
+    TableStateD <: TableState[D],
+    Layout // format: on
   ](
     tableDef: TableDef[D,
-                       _,
+                       TableOptsD,
                        TableInstanceType,
-                       _,
+                       ColumnOptsType,
                        ColumnType,
                        RowD,
                        CellType,
                        TableStateD,
-                       _
+                       Layout
     ] // Only used to infer types
   )(
     headerCellFn: Option[ColumnType[D] => TagMod],
@@ -133,16 +137,18 @@ object HTMLTable {
    */
   def virtualized[
     D, // format: off
+    TableOptsD <: UseTableOptions[D],
     TableInstanceType[d, col[d0], row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
+    ColumnOptsType[d, v, col[d0], row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
     ColumnType[d] <: Column[d],
     RowD <: Row[D],
     CellType[d, v] <: Cell[d, v],
     TableStateD <: TableState[D] // format: on
   ](
     tableDef: TableDef[D,
-                       _,
+                       TableOptsD,
                        TableInstanceType,
-                       _,
+                       ColumnOptsType,
                        ColumnType,
                        RowD,
                        CellType,

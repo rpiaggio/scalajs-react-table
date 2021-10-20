@@ -19,7 +19,7 @@ import reactST.reactTable.mod.Cell
 import reactST.reactTable.mod.TableState
 import reactST.reactTable.mod.ColumnInterface
 import reactST.reactTable.mod.ColumnGroup
-import reactST.reactTable.mod.UseSortByColumnOptions
+// import reactST.reactTable.mod.UseSortByColumnOptions
 import reactST.reactTable.mod.UseSortByOptions
 import reactST.reactTable.mod.UseSortByState
 import reactST.reactTable.mod.UseExpandedOptions
@@ -63,7 +63,7 @@ case class TableDefWithOptions[ // format: off
     TableStateD,
     Layout
   ],
-  cols:     Reusable[List[ColumnOptsType[D, js.Any, ColumnType, RowD, CellType, TableStateD]]],
+  cols:     Reusable[List[ColumnOptsType[D, _, ColumnType, RowD, CellType, TableStateD]]],
   data:     Reusable[List[D]],
   modOpts:  Reusable[TableOptsD => TableOptsD]
 )
@@ -80,19 +80,21 @@ case class TableDef[ // format: off
   Layout // format: on
 ](plugins: Set[Plugin]) {
   object Type {
-    type Options          = TableOptsD
-    type Instance         = TableInstanceType[D, ColumnType, RowD, CellType, TableStateD]
-    type ColumnOptions[V] = ColumnOptsType[D, V, ColumnType, RowD, CellType, TableStateD]
-    type Column           = ColumnType[D]
-    type Row              = RowD
-    type Cell[V]          = CellType[D, V]
-    type State            = TableStateD
+    type Options            = TableOptsD
+    type Instance           = TableInstanceType[D, ColumnType, RowD, CellType, TableStateD]
+    type ColumnOptions[V]   = ColumnOptsType[D, V, ColumnType, RowD, CellType, TableStateD]
+    type ColumnGroupOptions =
+      ColumnOptsType[D, _, ColumnType, RowD, CellType, TableStateD] // TODO Proper col group type
+    type Column  = ColumnType[D]
+    type Row     = RowD
+    type Cell[V] = CellType[D, V]
+    type State   = TableStateD
   }
 
   import syntax._
 
   def apply(
-    cols:    Reusable[List[Type.ColumnOptions[js.Any]]],
+    cols:    Reusable[List[Type.ColumnOptions[_]]],
     data:    Reusable[List[D]],
     modOpts: Reusable[TableOptsD => TableOptsD] = Reusable.always(identity[TableOptsD] _)
   ): TableDefWithOptions[
@@ -114,7 +116,7 @@ case class TableDef[ // format: off
    * Create a TableOptsD. columns and data are required. Other options can be `set*`.
    */
   protected[reactTable] def Options(
-    columns: js.Array[Type.ColumnOptions[js.Any]],
+    columns: js.Array[Type.ColumnOptions[_]],
     data:    js.Array[D]
   ): TableOptsD =
     emptyOptions
@@ -132,15 +134,15 @@ case class TableDef[ // format: off
    * Create a ColumnOptsD setup up for a simple column with an accessor string.
    */
   def Column[V](accessor: String): Type.ColumnOptions[V] =
-    // reactST.reactTable.facade.columnOptions.ColumnOptions
-    //   .ColumnOptionsMutableBuilder(emptyColumn[V])
-    //   .setAccessor(accessor)
     emptyColumn[V].setAccessor(accessor)
 
   /**
    * Create a ColumnOptsD setup up for a simple column with an accessor function.
    */
-  def Column[V](id: String, accessor: D => V): Type.ColumnOptions[V] =
+  def Column[V](
+    id:       String,
+    accessor: D => V
+  ): ColumnOptsType[D, V, ColumnType, RowD, CellType, TableStateD] = //Type.ColumnOptions[V] =
     Column(id, (d, _, _) => accessor(d))
 
   /**
@@ -176,11 +178,16 @@ case class TableDef[ // format: off
    * @param cols
    *   The columns to include in the group.
    */
-  def ColumnGroup(cols: (ColumnGroup[D] | Type.ColumnOptions[js.Any])*): ColumnGroupOptions[D] =
+  def ColumnGroup(
+    cols: (Type.ColumnGroupOptions | Type.ColumnOptions[_])*
+  ): Type.ColumnGroupOptions =
     js.Dynamic
       .literal()
-      .asInstanceOf[ColumnGroupOptions[D]]
-      .setColumns(cols.toJSArray.asInstanceOf[js.Array[reactST.reactTable.mod.Column[D]]])
+      .asInstanceOf[Type.ColumnGroupOptions]
+      .setColumns(
+        cols.toJSArray
+          .asInstanceOf[js.Array[ColumnOptions[D, _, ColumnType, RowD, CellType, TableStateD]]]
+      )
 
   /**
    * Create an empty instance of type StateType
@@ -218,11 +225,11 @@ case class TableDef[ // format: off
   /**
    * Add sort capabilities to the table via the useSortBy plugin hook.
    */
-  def withSort = withFeaturePlugin[
+  def withSortBy = withFeaturePlugin[
     TableOptsD with UseSortByOptions[D],
     TableInstanceType with UseSortByTableInstance,
-    ColumnOptsType with UseSortByColumnOptions, // move to our version
-    ColumnType with UseSortByColumn,
+    ColumnOptsType with UseSortByColumnOptions,
+    ColumnType, // with UseSortByColumn,
     RowD,
     CellType,
     TableStateD with UseSortByState[D]
@@ -303,81 +310,18 @@ case class TableDef[ // format: off
        * a subtype of UseSortByColumnOptions[D] and that worked. Unfortunately, requires
        * asInstanceOfs.
        */
-      def setSortByRowFn[V](
-        f:        D => V
-      )(implicit
-        ordering: Ordering[V],
-        ev:       Self <:< UseSortByColumnOptions[D]
-      ): Self = {
-        val sbfn: SortByFn[D] = (d1, d2, _, _) =>
-          ordering.compare(f(d1.original), f(d2.original)).toDouble
-        ev(col).setSortType(sbfn).asInstanceOf[Self]
-      }
+      // def setSortByRowFn[V](
+      //   f:        D => V
+      // )(implicit
+      //   ordering: Ordering[V],
+      //   ev:       Self <:< UseSortByColumnOptions[D]
+      // ): Self = {
+      //   val sbfn: SortByFn[D] = (d1, d2, _, _) =>
+      //     ordering.compare(f(d1.original), f(d2.original)).toDouble
+      //   ev(col).setSortType(sbfn).asInstanceOf[Self]
+      // }
     }
 
-    implicit class ColumnValueOptionOps[V, Self <: ColumnInterfaceBasedOnValue[_, _]](
-      col: Self with (ColumnInterfaceBasedOnValue[D, V])
-    ) {
-      @scala.inline
-      def setCell(value: CellProps[D, V] => VdomNode): Self =
-        StObject.set(col,
-                     "Cell",
-                     value
-                       .andThen(_.rawNode): js.Function1[CellProps[D, V], facade.React.Node]
-        )
-
-      // Next 4 methods just copied from ColumnInterfaceBasedOnValueMutableBuilder, which lacks the function overload above.
-      @scala.inline
-      def setCell(value: Renderer[CellProps[D, V]]): Self =
-        StObject.set(col, "Cell", value.asInstanceOf[js.Any])
-
-      @scala.inline
-      def setCellComponentClass(value: ComponentClassP[(CellProps[D, V]) with js.Object]): Self =
-        StObject.set(col, "Cell", value.asInstanceOf[js.Any])
-
-      @scala.inline
-      def setCellUndefined: Self = StObject.set(col, "Cell", js.undefined)
-
-      @scala.inline
-      def setCellVdomElement(value: VdomElement): Self =
-        StObject.set(col, "Cell", value.rawElement.asInstanceOf[js.Any])
-
-      /**
-       * Sets the sorting for the column based on a function on its value.
-       *
-       * @param f
-       *   A function from the value type to the target type.
-       * @param ordering
-       *   An implicit ordering for the target type.
-       * @param evidence
-       *   Evidence that this column is sortable.
-       */
-      def setSortByFn[U](f: V => U)(implicit
-        ordering:           Ordering[U],
-        ev:                 Self <:< UseSortByColumnOptions[D]
-      ): Self = {
-        val sbfn: SortByFn[D] = (d1, d2, col, _) =>
-          ordering
-            .compare(f(d1.values(col.asInstanceOf[String]).asInstanceOf[CellValue[V]]),
-                     f(d2.values(col.asInstanceOf[String]).asInstanceOf[CellValue[V]])
-            )
-            .toDouble
-        ev(col).setSortType(sbfn).asInstanceOf[Self]
-      }
-
-      /**
-       * Sets the sorting for the column based on its value.
-       *
-       * @param ordering
-       *   An implicit ordering for the value type.
-       * @param evidence
-       *   Evidence that this column is sortable.
-       */
-      def setSortByAuto(implicit
-        ordering: Ordering[V],
-        ev:       Self <:< UseSortByColumnOptions[D]
-      ): Self = setSortByFn(identity)
-    }
   }
 }
 
