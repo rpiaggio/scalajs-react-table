@@ -20,7 +20,8 @@ object DemoMain {
   case class Details(year: Int, pickups: Int, color: String)
   case class Guitar(id: Int, make: String, model: String, details: Details)
 
-  def rowClassEvenOdd[D]: (Int, D) => Css = (i, _) => if (i % 2 == 0) Css("even") else Css("odd")
+  def RowTypeClassEvenOdd[D]: (Int, D) => Css = (i, _) =>
+    if (i % 2 == 0) Css("even") else Css("odd")
 
   val guitars =
     Reusable.always(
@@ -88,7 +89,7 @@ object DemoMain {
       .render((_, tableInstance) =>
         HTMLTable.virtualized(VirtualizedTableDef)(
           tableClass = Css("virtualized"),
-          rowClassFn = rowClassEvenOdd,
+          RowTypeClassFn = RowTypeClassEvenOdd,
           headerCellFn = Some(HTMLTable.basicHeaderCellFn(useDiv = true))
         )(tableInstance)
       )
@@ -139,7 +140,8 @@ object DemoMain {
           tableClass = Css("virtualized"),
           bodyHeight = Some(300), // make this one a different height
           headerCellFn = Some(HTMLTable.sortableHeaderCellFn(useDiv = true)),
-          rowClassFn = (_: Int, p: RandomData.Person) => if (p.id % 2 == 0) Css("") else Css("big")
+          RowTypeClassFn =
+            (_: Int, p: RandomData.Person) => if (p.id % 2 == 0) Css("") else Css("big")
         )(tableInstance)
       )
 
@@ -171,8 +173,8 @@ object DemoMain {
       VirtualizedTable((virtualizedTableColumns, randomData)),
       <.h2("Sortable Virtualized Table"),
       SortedVirtualizedTable((sortedVirtualizedTableColumns, randomData)),
-      <.h2("Sortable Variable Row Height Virtualized Table"),
-      <.h3("Rows with odd id's are taller via CSS."),
+      <.h2("Sortable Variable RowType Height Virtualized Table"),
+      <.h3("RowTypes with odd id's are taller via CSS."),
       SortedVariableVirtualizedTable((sortedVariableVirtualizedTableColumns, randomData))
     )
       .renderIntoDOM(container)

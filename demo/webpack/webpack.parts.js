@@ -18,15 +18,15 @@ module.exports.rootDir = rootDir;
 const resourcesDir = path.resolve(rootDir, "src/main/resources");
 module.exports.resourcesDir = resourcesDir;
 
-// Set of browser to support on the css. Taken from Semantic-UI-React
-module.exports.browsers = {
-  browsers: [
+// Set of bRowTypeser to support on the css. Taken from Semantic-UI-React
+module.exports.bRowTypesers = {
+  bRowTypesers: [
     ">1%",
     "last 4 versions",
     "Firefox ESR",
-    "not ie < 9" // React doesn't support IE8 anyway
+    "not ie < 9", // React doesn't support IE8 anyway
   ],
-  flexbox: "no-2009"
+  flexbox: "no-2009",
 };
 
 // Setup webpack-dev-server. Use only in development
@@ -39,20 +39,20 @@ module.exports.devServer = ({ host, port } = {}) => ({
     historyApiFallback: true,
     contentBase: [__dirname, rootDir],
     hot: true,
-    historyApiFallback: true
+    historyApiFallback: true,
   },
   module: {
-    noParse: function(content) {
+    noParse: function (content) {
       return content.endsWith("-fastopt");
-    }
+    },
   },
-  plugins: [new Webpack.HotModuleReplacementPlugin()]
+  plugins: [new Webpack.HotModuleReplacementPlugin()],
 });
 
 module.exports.lessLoader = (options = {}) => {
   return {
     loader: "less-loader",
-    options: { sourceMap: true }
+    options: { sourceMap: true },
   };
 };
 
@@ -62,14 +62,14 @@ module.exports.extractCSS = ({
   include,
   exclude,
   use = [],
-  ci = false
+  ci = false,
 }) => {
   const filename = ci ? "[name].css" : "[name].[contenthash].css";
   const chunkFilename = ci ? "[id].css" : "[id].[contenthash].css";
   // Output extracted CSS to a file
   const plugin = new MiniCssExtractPlugin({
     filename: devMode ? "[name].css" : filename,
-    chunkFilename: devMode ? "[id].css" : chunkFilename
+    chunkFilename: devMode ? "[id].css" : chunkFilename,
   });
 
   return {
@@ -81,11 +81,11 @@ module.exports.extractCSS = ({
           exclude,
           use: [devMode ? "style-loader" : MiniCssExtractPlugin.loader].concat(
             use
-          )
-        }
-      ]
+          ),
+        },
+      ],
     },
-    plugins: [plugin]
+    plugins: [plugin],
   };
 };
 
@@ -94,17 +94,17 @@ exports.autoprefix = () => {
   return {
     loader: "postcss-loader",
     options: {
-      autoprefixer: module.exports.browsers,
-      plugins: () => [require("autoprefixer")()]
-    }
+      autoprefixer: module.exports.bRowTypesers,
+      plugins: () => [require("autoprefixer")()],
+    },
   };
 };
 
 // This is needed for scala.js projects
 module.exports.resourceModules = {
   resolve: {
-    modules: [path.resolve(__dirname, "node_modules"), resourcesDir]
-  }
+    modules: [path.resolve(__dirname, "node_modules"), resourcesDir],
+  },
 };
 
 // Let webpack find assets on sbt paths
@@ -114,9 +114,9 @@ module.exports.resolve = {
       // Find files on resources
       resources: resourcesDir,
       // Used to find the produced scala.js file
-      sjs: __dirname
-    }
-  }
+      sjs: __dirname,
+    },
+  },
 };
 
 // Support for loading semantic ui themes and less configuration
@@ -124,9 +124,9 @@ module.exports.resolveSemanticUI = {
   resolve: {
     alias: {
       // Required for the custom Semantic UI theme
-      "../../theme.config$": path.join(resourcesDir, "theme/theme.config")
-    }
-  }
+      "../../theme.config$": path.join(resourcesDir, "theme/theme.config"),
+    },
+  },
 };
 
 // Support css minifications
@@ -135,9 +135,9 @@ exports.minifyCSS = ({ options }) => ({
     new OptimizeCSSAssetsPlugin({
       cssProcessor: cssnano,
       cssProcessorOptions: options,
-      canPrint: false
-    })
-  ]
+      canPrint: false,
+    }),
+  ],
 });
 
 // Support js minification
@@ -148,10 +148,10 @@ exports.minifyJavaScript = () => ({
       new UglifyWebpackPlugin({
         parallel: true,
         uglifyOptions: { mangle: true },
-        sourceMap: false
-      })
-    ]
-  }
+        sourceMap: false,
+      }),
+    ],
+  },
 });
 
 // Loader for fonts
@@ -172,12 +172,12 @@ exports.fontAssets = {
             mimetype: "application/font-woff",
 
             // Output below fonts directory
-            name: "[name].[hash].[ext]"
-          }
-        }
-      }
-    ]
-  }
+            name: "[name].[hash].[ext]",
+          },
+        },
+      },
+    ],
+  },
 };
 
 // Loads assets as files including images, audio and old style fonts
@@ -188,9 +188,9 @@ exports.extraAssets = {
         test: /\.jpe?g$|\.gif$|\.png$|\.ttf$|\.eot$|\.svg$|.mp3$/,
         loader: "file-loader",
         options: {
-          name: "[name].[hash].[ext]"
-        }
-      }
-    ]
-  }
+          name: "[name].[hash].[ext]",
+        },
+      },
+    ],
+  },
 };

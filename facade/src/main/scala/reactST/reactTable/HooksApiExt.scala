@@ -2,7 +2,7 @@ package reactST.reactTable
 
 import japgolly.scalajs.react._
 import reactST.reactTable._
-import reactST.reactTable.mod.Row
+import reactST.reactTable.mod.RowType
 import reactST.reactTable.mod.Cell
 import reactST.reactTable.mod.TableState
 import reactST.reactTable.mod.UseTableOptions
@@ -15,12 +15,18 @@ object HooksApiExt {
     final def useTable[
       D,
       TableOptsD <: UseTableOptions[D],
-      TableInstanceD[d, co, col, row, cell[d0, v], s] <: TableInstance[d, co, col, row, cell, s],
+      TableInstanceD[d, co, col, RowType, cell[d0, v], s] <: TableInstance[d,
+                                                                           co,
+                                                                           col,
+                                                                           RowType,
+                                                                           cell,
+                                                                           s
+      ],
       ColumnOptsD <: ColumnOptions[D],
       ColumnObjectD <: ColumnObject[D],
-      RowD <: Row[D],
-      CellD[d0, v] <: Cell[d0, v],
-      TableStateD <: TableState[D],
+      RowTypeD <: RowType[D],
+      CellType[d0, v] <: Cell[d0, v],
+      StateType <: TableState[D],
       Layout
     ](
       tableDefWithOptions: TableDefWithOptions[
@@ -29,27 +35,33 @@ object HooksApiExt {
         TableInstanceD,
         ColumnOptsD,
         ColumnObjectD,
-        RowD,
-        CellD,
-        TableStateD,
+        RowTypeD,
+        CellType,
+        StateType,
         Layout
       ]
     )(implicit
       step:                Step
     ): step.Next[Reusable[
-      TableInstanceD[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD]
+      TableInstanceD[D, ColumnOptsD, ColumnObjectD, RowTypeD, CellType, StateType]
     ]] =
       useTableBy(_ => tableDefWithOptions)
 
     final def useTableBy[
       D,
       TableOptsD <: UseTableOptions[D],
-      TableInstanceD[d, co, col, row, cell[d0, v], s] <: TableInstance[d, co, col, row, cell, s],
+      TableInstanceD[d, co, col, RowType, cell[d0, v], s] <: TableInstance[d,
+                                                                           co,
+                                                                           col,
+                                                                           RowType,
+                                                                           cell,
+                                                                           s
+      ],
       ColumnOptsD <: ColumnOptions[D],
       ColumnObjectD <: ColumnObject[D],
-      RowD <: Row[D],
-      CellD[d0, v] <: Cell[d0, v],
-      TableStateD <: TableState[D],
+      RowTypeD <: RowType[D],
+      CellType[d0, v] <: Cell[d0, v],
+      StateType <: TableState[D],
       Layout
     ](
       tableDefWithOptions: Ctx => TableDefWithOptions[
@@ -58,15 +70,15 @@ object HooksApiExt {
         TableInstanceD,
         ColumnOptsD,
         ColumnObjectD,
-        RowD,
-        CellD,
-        TableStateD,
+        RowTypeD,
+        CellType,
+        StateType,
         Layout
       ]
     )(implicit
       step:                Step
     ): step.Next[Reusable[
-      TableInstanceD[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD]
+      TableInstanceD[D, ColumnOptsD, ColumnObjectD, RowTypeD, CellType, StateType]
     ]] =
       api.customBy(ctx => TableHooks.useTableHook(tableDefWithOptions(ctx)))
   }
@@ -78,12 +90,18 @@ object HooksApiExt {
     def useTableBy[
       D,
       TableOptsD <: UseTableOptions[D],
-      TableInstanceD[d, co, col, row, cell[d0, v], s] <: TableInstance[d, co, col, row, cell, s],
+      TableInstanceD[d, co, col, RowType, cell[d0, v], s] <: TableInstance[d,
+                                                                           co,
+                                                                           col,
+                                                                           RowType,
+                                                                           cell,
+                                                                           s
+      ],
       ColumnOptsD <: ColumnOptions[D],
       ColumnObjectD <: ColumnObject[D],
-      RowD <: Row[D],
-      CellD[d0, v] <: Cell[d0, v],
-      TableStateD <: TableState[D],
+      RowTypeD <: RowType[D],
+      CellType[d0, v] <: Cell[d0, v],
+      StateType <: TableState[D],
       Layout
     ](
       tableDefWithOptions: CtxFn[TableDefWithOptions[
@@ -92,15 +110,15 @@ object HooksApiExt {
         TableInstanceD,
         ColumnOptsD,
         ColumnObjectD,
-        RowD,
-        CellD,
-        TableStateD,
+        RowTypeD,
+        CellType,
+        StateType,
         Layout
       ]]
     )(implicit
       step:                Step
     ): step.Next[Reusable[
-      TableInstanceD[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD]
+      TableInstanceD[D, ColumnOptsD, ColumnObjectD, RowTypeD, CellType, StateType]
     ]] =
       super.useTableBy(step.squash(tableDefWithOptions)(_))
 

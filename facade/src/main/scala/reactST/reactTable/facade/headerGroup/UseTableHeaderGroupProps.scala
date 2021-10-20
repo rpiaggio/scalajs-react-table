@@ -10,7 +10,7 @@ import reactST.reactTable.mod.TableHeaderProps
 import reactST.reactTable.mod.HeaderGroupPropGetter
 
 @js.native
-trait UseTableHeaderGroupProps[D] extends js.Object {
+trait UseTableHeaderGroupProps[D, ColumnType] extends js.Object {
 
   def getFooterGroupProps(): TableFooterProps                                     = js.native
   def getFooterGroupProps(propGetter: FooterGroupPropGetter[D]): TableFooterProps = js.native
@@ -18,7 +18,7 @@ trait UseTableHeaderGroupProps[D] extends js.Object {
   def getHeaderGroupProps(): TableHeaderProps                                     = js.native
   def getHeaderGroupProps(propGetter: HeaderGroupPropGetter[D]): TableHeaderProps = js.native
 
-  var headers: js.Array[HeaderGroup[D]] = js.native
+  var headers: js.Array[ColumnType] = js.native
 
   var totalHeaderCount: Double = js.native
 }

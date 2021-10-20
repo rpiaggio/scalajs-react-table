@@ -5,20 +5,25 @@ import reactST.reactTable.mod.IdType
 import scala.scalajs.js
 
 @js.native
-trait UseExpandedTableInstance[D, ColumnOptsD, ColumnObjectD, RowD, CellD[d, v], TableStateD]
-    extends TableInstance[D, ColumnOptsD, ColumnObjectD, RowD, CellD, TableStateD] {
+trait UseExpandedTableInstance[
+  D, // format: off
+  ColumnType[d],
+  RowType,
+  CellType[d, v],
+  StateType // format: on
+] extends TableInstance[D, ColumnType, RowType, CellType, StateType] {
 
   var expandedDepth: Double = js.native
 
-  var expandedRows: js.Array[RowD] = js.native
+  var expandedRowTypes: js.Array[RowType] = js.native
 
-  var isAllRowsExpanded: Boolean = js.native
+  var isAllRowTypesExpanded: Boolean = js.native
 
-  var preExpandedRows: js.Array[RowD] = js.native
+  var preExpandedRowTypes: js.Array[RowType] = js.native
 
-  def toggleAllRowsExpanded(): Unit               = js.native
-  def toggleAllRowsExpanded(value: Boolean): Unit = js.native
+  def toggleAllRowTypesExpanded(): Unit               = js.native
+  def toggleAllRowTypesExpanded(value: Boolean): Unit = js.native
 
-  def toggleRowExpanded(id: js.Array[IdType[D]]): Unit                 = js.native
-  def toggleRowExpanded(id: js.Array[IdType[D]], value: Boolean): Unit = js.native
+  def toggleRowTypeExpanded(id: js.Array[IdType[D]]): Unit                 = js.native
+  def toggleRowTypeExpanded(id: js.Array[IdType[D]], value: Boolean): Unit = js.native
 }
