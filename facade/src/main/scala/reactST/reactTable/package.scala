@@ -18,6 +18,7 @@ package object reactTable extends HooksApiExt {
   type ColumnGroupOptions[d, v, col, row, cell[d0, v], s] =
     facade.columnOptions.ColumnOptions[d, v, col, row, cell, s]
 
-  type Column[d]          = facade.column.Column[d]
-  type UseSortByColumn[d] = facade.column.UseSortByColumn[d]
+  type Column[d]                 = facade.column.Column[d]
+  type UseSortByColumn[d]        = facade.column.UseSortByColumn[d]
+  type UseResizeColumnsColumn[d] = facade.column.UseResizeColumnsColumn[d]
 }

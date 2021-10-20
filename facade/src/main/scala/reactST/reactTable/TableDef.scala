@@ -19,7 +19,6 @@ import reactST.reactTable.mod.Cell
 import reactST.reactTable.mod.TableState
 import reactST.reactTable.mod.ColumnInterface
 import reactST.reactTable.mod.ColumnGroup
-// import reactST.reactTable.mod.UseSortByColumnOptions
 import reactST.reactTable.mod.UseSortByOptions
 import reactST.reactTable.mod.UseSortByState
 import reactST.reactTable.mod.UseExpandedOptions
@@ -456,8 +455,8 @@ object TableDef {
     def withResizeColumns = tableDef.withFeaturePlugin[
       TableOptsD with UseResizeColumnsOptions[D],
       TableInstanceType,
-      ColumnOptsType, // FIXME with UseResizeColumnsColumnOptions,
-      ColumnD,        // FIXME  with UseResizeColumnsColumnOptions[D],
+      ColumnOptsType with UseResizeColumnsColumnOptions,
+      ColumnD with UseResizeColumnsColumn[D],
       RowD,
       CellType,
       TableStateD with UseResizeColumnsState[D]
