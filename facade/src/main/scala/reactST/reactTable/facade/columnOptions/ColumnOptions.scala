@@ -23,12 +23,12 @@ import japgolly.scalajs.react.facade.React.ComponentClassP
 trait ColumnOptions[ // format: off
   D,
   V,
-  ColumnType[d],
+  ColumnD,
   RowType,
   CellType[d, v],
   StateType // format: on
 ] extends js.Object {
-  val Cell: js.UndefOr[Renderer[CellProps[D, V, ColumnType, RowType, CellType, StateType]]] =
+  val Cell: js.UndefOr[Renderer[CellProps[D, V, ColumnD, RowType, CellType, StateType]]] =
     js.native
 
   var Header: js.UndefOr[Renderer[HeaderProps[D]]] = js.native
@@ -39,7 +39,7 @@ trait ColumnOptions[ // format: off
 
   // TODO Proper col group type
   var columns: js.UndefOr[
-    js.Array[ColumnOptions[D, _, ColumnType, RowType, CellType, StateType]]
+    js.Array[ColumnOptions[D, _, ColumnD, RowType, CellType, StateType]]
   ] = js.native
 
   var depth: Double = js.native
@@ -62,12 +62,12 @@ trait ColumnOptions[ // format: off
 
   var minWidth: js.UndefOr[Double] = js.native
 
-  def parent[VP]: js.UndefOr[ColumnOptions[D, VP, ColumnType, RowType, CellType, StateType]] =
+  def parent[VP]: js.UndefOr[ColumnOptions[D, VP, ColumnD, RowType, CellType, StateType]] =
     js.native
 
   // not documented
   var placeholderOf
-    : js.UndefOr[ColumnOptions[js.Object, js.Any, ColumnType, RowType, CellType, StateType]] =
+    : js.UndefOr[ColumnOptions[js.Object, js.Any, ColumnD, RowType, CellType, StateType]] =
     js.native
 
   def render(`type`: String): Node                   = js.native
@@ -97,14 +97,14 @@ object ColumnOptions {
   implicit class ColumnOptionsMutableBuilder[
     D, // format: off
     V,
-    ColumnType[d],
+    ColumnD,
     RowD,
     CellType[d, v],
     TableStateD,
     Self
     // ColumnOptsType[d, v, col[d0], row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s]
     // Self <: ColumnOptions[D, V, ColumnType, RowType, CellType, StateType] // format: on
-  ](val colOpts: Self with ColumnOptions[D, V, ColumnType, RowD, CellType, TableStateD])
+  ](val colOpts: Self with ColumnOptions[D, V, ColumnD, RowD, CellType, TableStateD])
       extends AnyVal {
     // type Self = ColumnOptsType[D, V, ColumnType, RowType, CellType, StateType]
 
@@ -115,20 +115,20 @@ object ColumnOptions {
     }
 
     @scala.inline
-         def setCell(value: CellProps[D, V, ColumnType, RowD, CellType, TableStateD] => VdomNode): Self =
+         def setCell(value: CellProps[D, V, ColumnD, RowD, CellType, TableStateD] => VdomNode): Self =
            StObject.set(colOpts,
                         "Cell",
                         value
-                          .andThen(_.rawNode): js.Function1[CellProps[D, V, ColumnType, RowD, CellType, TableStateD], Node]
+                          .andThen(_.rawNode): js.Function1[CellProps[D, V, ColumnD, RowD, CellType, TableStateD], Node]
            )
 
          // Next 4 methods just copied from ColumnInterfaceBasedOnValueMutableBuilder, which lacks the function overload above.
          @scala.inline
-         def setCell(value: Renderer[CellProps[D, V, ColumnType, RowD, CellType, TableStateD]]): Self =
+         def setCell(value: Renderer[CellProps[D, V, ColumnD, RowD, CellType, TableStateD]]): Self =
            StObject.set(colOpts, "Cell", value.asInstanceOf[js.Any])
 
          @scala.inline
-         def setCellComponentClass(value: ComponentClassP[CellProps[D, V, ColumnType, RowD, CellType, TableStateD]]): Self =
+         def setCellComponentClass(value: ComponentClassP[CellProps[D, V, ColumnD, RowD, CellType, TableStateD]]): Self =
            StObject.set(colOpts, "Cell", value.asInstanceOf[js.Any])
 
          @scala.inline
@@ -172,11 +172,11 @@ object ColumnOptions {
     // TODO PRoper col group type
     @scala.inline
     // def setColumns(value: js.Array[ColumnOptsType[D, _, ColumnType, RowType, CellType, StateType]]): Self = StObject.set(colOpts, "columns", value.asInstanceOf[js.Any])
-    def setColumns(value: js.Array[ColumnOptions[D, _, ColumnType, RowD, CellType, TableStateD]]): Self = StObject.set(colOpts, "columns", value.asInstanceOf[js.Any])
+    def setColumns(value: js.Array[ColumnOptions[D, _, ColumnD, RowD, CellType, TableStateD]]): Self = StObject.set(colOpts, "columns", value.asInstanceOf[js.Any])
 
     @scala.inline
     // def setColumnsVarargs(value: ColumnOptsType[D, _, ColumnType, RowType, CellType, StateType]*): Self = StObject.set(colOpts, "columns", js.Array(value :_*))
-    def setColumnsVarargs(value: ColumnOptions[D, _, ColumnType, RowD, CellType, TableStateD]*): Self = StObject.set(colOpts, "columns", js.Array(value :_*))
+    def setColumnsVarargs(value: ColumnOptions[D, _, ColumnD, RowD, CellType, TableStateD]*): Self = StObject.set(colOpts, "columns", js.Array(value :_*))
 
   }
 }

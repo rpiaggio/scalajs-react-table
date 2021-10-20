@@ -15,9 +15,9 @@ object HooksApiExt {
     final def useTable[
       D,
       TableOptsD <: UseTableOptions[D],
-      TableInstanceType[d, col[d0], row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
-      ColumnOptsType[d, v, col[d0], row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
-      ColumnType[d] <: Column[d],
+      TableInstanceType[d, col, row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
+      ColumnOptsType[d, v, col, row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
+      ColumnD <: Column[D],
       RowD <: Row[D],
       CellType[d, v] <: Cell[d, v],
       TableStateD <: TableState[D],
@@ -28,7 +28,7 @@ object HooksApiExt {
         TableOptsD,
         TableInstanceType,
         ColumnOptsType,
-        ColumnType,
+        ColumnD,
         RowD,
         CellType,
         TableStateD,
@@ -37,16 +37,16 @@ object HooksApiExt {
     )(implicit
       step:                Step
     ): step.Next[Reusable[
-      TableInstanceType[D, ColumnType, RowD, CellType, TableStateD]
+      TableInstanceType[D, ColumnD, RowD, CellType, TableStateD]
     ]] =
       useTableBy(_ => tableDefWithOptions)
 
     final def useTableBy[
       D,
       TableOptsD <: UseTableOptions[D],
-      TableInstanceType[d, col[d0], row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
-      ColumnOptsType[d, v, col[d0], row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
-      ColumnType[d] <: Column[d],
+      TableInstanceType[d, col, row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
+      ColumnOptsType[d, v, col, row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
+      ColumnD <: Column[D],
       RowD <: Row[D],
       CellType[d, v] <: Cell[d, v],
       TableStateD <: TableState[D],
@@ -57,7 +57,7 @@ object HooksApiExt {
         TableOptsD,
         TableInstanceType,
         ColumnOptsType,
-        ColumnType,
+        ColumnD,
         RowD,
         CellType,
         TableStateD,
@@ -66,7 +66,7 @@ object HooksApiExt {
     )(implicit
       step:                Step
     ): step.Next[Reusable[
-      TableInstanceType[D, ColumnType, RowD, CellType, TableStateD]
+      TableInstanceType[D, ColumnD, RowD, CellType, TableStateD]
     ]] =
       api.customBy(ctx => TableHooks.useTableHook(tableDefWithOptions(ctx)))
   }
@@ -78,9 +78,9 @@ object HooksApiExt {
     def useTableBy[
       D,
       TableOptsD <: UseTableOptions[D],
-      TableInstanceType[d, col[d0], row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
-      ColumnOptsType[d, v, col[d0], row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
-      ColumnType[d] <: Column[d],
+      TableInstanceType[d, col, row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
+      ColumnOptsType[d, v, col, row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
+      ColumnD <: Column[D],
       RowD <: Row[D],
       CellType[d, v] <: Cell[d, v],
       TableStateD <: TableState[D],
@@ -91,7 +91,7 @@ object HooksApiExt {
         TableOptsD,
         TableInstanceType,
         ColumnOptsType,
-        ColumnType,
+        ColumnD,
         RowD,
         CellType,
         TableStateD,
@@ -100,7 +100,7 @@ object HooksApiExt {
     )(implicit
       step:                Step
     ): step.Next[Reusable[
-      TableInstanceType[D, ColumnType, RowD, CellType, TableStateD]
+      TableInstanceType[D, ColumnD, RowD, CellType, TableStateD]
     ]] =
       super.useTableBy(step.squash(tableDefWithOptions)(_))
 

@@ -44,9 +44,9 @@ import scalajs.js.JSConverters._
 case class TableDefWithOptions[ // format: off
   D,
   TableOptsD <: UseTableOptions[D],
-  TableInstanceType[d, col[d0], row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
-  ColumnOptsType[d, v, col[d0], row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
-  ColumnType[d] <: Column[d],
+  TableInstanceType[d, col, row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
+  ColumnOptsType[d, v, col, row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
+  ColumnD <: Column[D],
   RowD <: Row[D],
   CellType[d, v] <: Cell[d, v],
   TableStateD <: TableState[D],
@@ -57,13 +57,13 @@ case class TableDefWithOptions[ // format: off
     TableOptsD,
     TableInstanceType,
     ColumnOptsType,
-    ColumnType,
+    ColumnD,
     RowD,
     CellType,
     TableStateD,
     Layout
   ],
-  cols:     Reusable[List[ColumnOptsType[D, _, ColumnType, RowD, CellType, TableStateD]]],
+  cols:     Reusable[List[ColumnOptsType[D, _, ColumnD, RowD, CellType, TableStateD]]],
   data:     Reusable[List[D]],
   modOpts:  Reusable[TableOptsD => TableOptsD]
 )
@@ -71,9 +71,9 @@ case class TableDefWithOptions[ // format: off
 case class TableDef[ // format: off
   D,
   TableOptsD <: UseTableOptions[D],
-  TableInstanceType[d, col[d0], row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
-  ColumnOptsType[d, v, col[d0], row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
-  ColumnType[d] <: Column[d],
+  TableInstanceType[d, col, row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
+  ColumnOptsType[d, v, col, row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
+  ColumnD <: Column[D],
   RowD <: Row[D],
   CellType[d, v] <: Cell[d, v],
   TableStateD <: TableState[D],
@@ -81,11 +81,11 @@ case class TableDef[ // format: off
 ](plugins: Set[Plugin]) {
   object Type {
     type Options            = TableOptsD
-    type Instance           = TableInstanceType[D, ColumnType, RowD, CellType, TableStateD]
-    type ColumnOptions[V]   = ColumnOptsType[D, V, ColumnType, RowD, CellType, TableStateD]
+    type Instance           = TableInstanceType[D, ColumnD, RowD, CellType, TableStateD]
+    type ColumnOptions[V]   = ColumnOptsType[D, V, ColumnD, RowD, CellType, TableStateD]
     type ColumnGroupOptions =
-      ColumnOptsType[D, _, ColumnType, RowD, CellType, TableStateD] // TODO Proper col group type
-    type Column  = ColumnType[D]
+      ColumnOptsType[D, _, ColumnD, RowD, CellType, TableStateD] // TODO Proper col group type
+    type Column  = ColumnD
     type Row     = RowD
     type Cell[V] = CellType[D, V]
     type State   = TableStateD
@@ -102,7 +102,7 @@ case class TableDef[ // format: off
     TableOptsD,
     TableInstanceType,
     ColumnOptsType,
-    ColumnType,
+    ColumnD,
     RowD,
     CellType,
     TableStateD,
@@ -142,7 +142,7 @@ case class TableDef[ // format: off
   def Column[V](
     id:       String,
     accessor: D => V
-  ): ColumnOptsType[D, V, ColumnType, RowD, CellType, TableStateD] = //Type.ColumnOptions[V] =
+  ): Type.ColumnOptions[V] =
     Column(id, (d, _, _) => accessor(d))
 
   /**
@@ -186,7 +186,7 @@ case class TableDef[ // format: off
       .asInstanceOf[Type.ColumnGroupOptions]
       .setColumns(
         cols.toJSArray
-          .asInstanceOf[js.Array[ColumnOptions[D, _, ColumnType, RowD, CellType, TableStateD]]]
+          .asInstanceOf[js.Array[ColumnOptions[D, _, ColumnD, RowD, CellType, TableStateD]]]
       )
 
   /**
@@ -204,9 +204,9 @@ case class TableDef[ // format: off
 
   protected[reactST] def withFeaturePlugin[ // format: off
     NewTableOptsD <: UseTableOptions[D],
-    NewTableInstanceD[d, col[d0], row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
-    NewColumnOptsType[d, v, col[d0], row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
-    NewColumnType[d] <: Column[d],
+    NewTableInstanceD[d, col, row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
+    NewColumnOptsType[d, v, col, row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
+    NewColumnD <: Column[D],
     NewRowD <: Row[D],
     NewCellType[d, v] <: Cell[d, v],
     NewTableStateD <: TableState[D] // format: on
@@ -215,7 +215,7 @@ case class TableDef[ // format: off
              NewTableOptsD,
              NewTableInstanceD,
              NewColumnOptsType,
-             NewColumnType,
+             NewColumnD,
              NewRowD,
              NewCellType,
              NewTableStateD,
@@ -229,7 +229,7 @@ case class TableDef[ // format: off
     TableOptsD with UseSortByOptions[D],
     TableInstanceType with UseSortByTableInstance,
     ColumnOptsType with UseSortByColumnOptions,
-    ColumnType, // with UseSortByColumn,
+    ColumnD with UseSortByColumn[D],
     RowD,
     CellType,
     TableStateD with UseSortByState[D]
@@ -242,7 +242,7 @@ case class TableDef[ // format: off
     TableOptsD with UseExpandedOptions[D],
     TableInstanceType with UseExpandedTableInstance,
     ColumnOptsType,
-    ColumnType,
+    ColumnD,
     RowD with UseExpandedRowProps[D],
     CellType,
     TableStateD with UseExpandedState[D]
@@ -331,7 +331,7 @@ object TableDef {
     UseTableOptions[D],
     TableInstance,
     ColumnOptions,
-    Column,
+    Column[D],
     Row[D],
     Cell,
     TableState[D],
@@ -341,7 +341,7 @@ object TableDef {
     UseTableOptions[D],
     TableInstance,
     ColumnOptions,
-    Column,
+    Column[D],
     Row[D],
     Cell,
     TableState[D],
@@ -352,9 +352,9 @@ object TableDef {
   implicit class TableLayoutTableDefOps[ // format: off
     D,
     TableOptsD <: UseTableOptions[D],
-    TableInstanceType[d, col[d0], row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
-    ColumnOptsType[d, v, col[d0], row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
-    ColumnType[d] <: Column[d],
+    TableInstanceType[d, col, row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
+    ColumnOptsType[d, v, col, row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
+    ColumnD <: Column[D],
     RowD <: Row[D],
     CellType[d, v] <: Cell[d, v],
     TableStateD <: TableState[D],
@@ -364,7 +364,7 @@ object TableDef {
       TableOptsD,
       TableInstanceType,
       ColumnOptsType,
-      ColumnType,
+      ColumnD,
       RowD,
       CellType,
       TableStateD,
@@ -372,9 +372,9 @@ object TableDef {
   ]) extends AnyVal { 
     private def withLayoutPlugin[
       NewTableOptsD <: UseTableOptions[D],
-      NewTableInstanceType[d, col[d0], row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
-      NewColumnOptsType[d, v, col[d0], row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
-      NewColumnType[d] <: Column[d],
+      NewTableInstanceType[d, col, row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
+      NewColumnOptsType[d, v, col, row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
+      NewColumnD <: Column[D],
       NewRowD <: Row[D],
       NewCellType[d, v] <: Cell[d, v],
       NewTableStateD <: TableState[D] // format: on
@@ -383,7 +383,7 @@ object TableDef {
                NewTableOptsD,
                NewTableInstanceType,
                NewColumnOptsType,
-               NewColumnType,
+               NewColumnD,
                NewRowD,
                NewCellType,
                NewTableStateD,
@@ -403,7 +403,7 @@ object TableDef {
       TableOptsD,
       TableInstanceType,
       ColumnOptsType,
-      ColumnType,
+      ColumnD,
       RowD,
       CellType,
       TableStateD
@@ -420,7 +420,7 @@ object TableDef {
       TableOptsD,
       TableInstanceType,
       ColumnOptsType,
-      ColumnType,
+      ColumnD,
       RowD,
       CellType,
       TableStateD
@@ -430,9 +430,9 @@ object TableDef {
   implicit class NonTableLayoutTableDefOps[ // format: off
     D, 
     TableOptsD <: UseTableOptions[D],
-    TableInstanceType[d, col[d0], row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
-    ColumnOptsType[d, v, col[d0], row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
-    ColumnType[d] <: Column[d],
+    TableInstanceType[d, col, row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
+    ColumnOptsType[d, v, col, row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
+    ColumnD <: Column[D],
     RowD <: Row[D],
     CellType[d, v] <: Cell[d, v],
     TableStateD <: TableState[D] // format: on
@@ -442,7 +442,7 @@ object TableDef {
       TableOptsD,
       TableInstanceType,
       ColumnOptsType,
-      ColumnType,
+      ColumnD,
       RowD,
       CellType,
       TableStateD,
@@ -456,8 +456,8 @@ object TableDef {
     def withResizeColumns = tableDef.withFeaturePlugin[
       TableOptsD with UseResizeColumnsOptions[D],
       TableInstanceType,
-      ColumnOptsType with UseResizeColumnsColumnOptions,
-      ColumnType with UseResizeColumnsColumnOptions,
+      ColumnOptsType, // FIXME with UseResizeColumnsColumnOptions,
+      ColumnD,        // FIXME  with UseResizeColumnsColumnOptions[D],
       RowD,
       CellType,
       TableStateD with UseResizeColumnsState[D]

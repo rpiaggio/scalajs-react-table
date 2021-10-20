@@ -8,13 +8,13 @@ import scala.scalajs.js
 @js.native
 trait UseSortByTableInstance[
   D, // format: off
-  ColumnType[d],
-  RowType,
+  ColumnD,
+  RowD,
   CellType[d, v],
-  StateType // format: on
-] extends TableInstance[D, ColumnType, RowType, CellType, StateType] {
+  TableStateD // format: on
+] extends TableInstance[D, ColumnD, RowD, CellType, TableStateD] {
 
-  var preSortedRowTypes: js.Array[RowType] = js.native
+  var preSortedRowTypes: js.Array[RowD] = js.native
 
   def setSortBy(sortBy: js.Array[SortingRule[D]]): Unit = js.native
 

@@ -51,9 +51,9 @@ object HTMLTable {
   def apply[
     D, // format: off
     TableOptsD <: UseTableOptions[D],
-    TableInstanceType[d, col[d0], row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
-    ColumnOptsType[d, v, col[d0], row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
-    ColumnType[d] <: Column[d],
+    TableInstanceType[d, col, row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
+    ColumnOptsType[d, v, col, row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
+    ColumnD <: Column[D],
     RowD <: Row[D],
     CellType[d, v] <: Cell[d, v],
     TableStateD <: TableState[D],
@@ -63,43 +63,42 @@ object HTMLTable {
                        TableOptsD,
                        TableInstanceType,
                        ColumnOptsType,
-                       ColumnType,
+                       ColumnD,
                        RowD,
                        CellType,
                        TableStateD,
                        Layout
     ] // Only used to infer types
   )(
-    headerCellFn: Option[ColumnType[D] => TagMod],
+    headerCellFn: Option[ColumnD => TagMod],
     tableClass:   Css = Css(""),
     rowClassFn:   (Int, D) => Css = (_: Int, _: D) => Css(""),
     footer:       TagMod = TagMod.empty
   ) =
-    ScalaFnComponent[TableInstanceType[D, ColumnType, RowD, CellType, TableStateD]] {
-      tableInstance =>
-        val bodyProps = tableInstance.getTableBodyProps()
+    ScalaFnComponent[TableInstanceType[D, ColumnD, RowD, CellType, TableStateD]] { tableInstance =>
+      val bodyProps = tableInstance.getTableBodyProps()
 
-        val header = headerCellFn.fold(TagMod.empty) { f =>
-          <.thead(
-            tableInstance.headerGroups.toTagMod { g =>
-              <.tr(
-                props2Attrs(g.getHeaderGroupProps()),
-                g.headers.toTagMod(f(_))
-              )
-            }
-          )
-        }
-
-        val rows = tableInstance.rows.toTagMod { rd =>
-          tableInstance.prepareRow(rd)
-          val rowClass = rowClassFn(rd.index.toInt, rd.original)
-          val cells    = rd.cells.toTagMod { cell =>
-            <.td(props2Attrs(cell.getCellProps()), cell.renderCell)
+      val header = headerCellFn.fold(TagMod.empty) { f =>
+        <.thead(
+          tableInstance.headerGroups.toTagMod { g =>
+            <.tr(
+              props2Attrs(g.getHeaderGroupProps()),
+              g.headers.toTagMod(f(_))
+            )
           }
-          <.tr(rowClass, props2Attrs(rd.getRowProps()), cells)
-        }
+        )
+      }
 
-        <.table(tableClass, header, <.tbody(props2Attrs(bodyProps), rows), footer)
+      val rows = tableInstance.rows.toTagMod { rd =>
+        tableInstance.prepareRow(rd)
+        val rowClass = rowClassFn(rd.index.toInt, rd.original)
+        val cells    = rd.cells.toTagMod { cell =>
+          <.td(props2Attrs(cell.getCellProps()), cell.renderCell)
+        }
+        <.tr(rowClass, props2Attrs(rd.getRowProps()), cells)
+      }
+
+      <.table(tableClass, header, <.tbody(props2Attrs(bodyProps), rows), footer)
     }
 
   /**
@@ -138,9 +137,9 @@ object HTMLTable {
   def virtualized[
     D, // format: off
     TableOptsD <: UseTableOptions[D],
-    TableInstanceType[d, col[d0], row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
-    ColumnOptsType[d, v, col[d0], row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
-    ColumnType[d] <: Column[d],
+    TableInstanceType[d, col, row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
+    ColumnOptsType[d, v, col, row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
+    ColumnD <: Column[D],
     RowD <: Row[D],
     CellType[d, v] <: Cell[d, v],
     TableStateD <: TableState[D] // format: on
@@ -149,7 +148,7 @@ object HTMLTable {
                        TableOptsD,
                        TableInstanceType,
                        ColumnOptsType,
-                       ColumnType,
+                       ColumnD,
                        RowD,
                        CellType,
                        TableStateD,
@@ -157,48 +156,47 @@ object HTMLTable {
     ] // Only used to infer types
   )(
     bodyHeight:   Option[Double] = None,
-    headerCellFn: Option[ColumnType[D] => TagMod],
+    headerCellFn: Option[ColumnD => TagMod],
     tableClass:   Css = Css(""),
     rowClassFn:   (Int, D) => Css = (_: Int, _: D) => Css("")
   ) =
-    ScalaFnComponent[TableInstanceType[D, ColumnType, RowD, CellType, TableStateD]] {
-      tableInstance =>
-        val bodyProps = tableInstance.getTableBodyProps()
+    ScalaFnComponent[TableInstanceType[D, ColumnD, RowD, CellType, TableStateD]] { tableInstance =>
+      val bodyProps = tableInstance.getTableBodyProps()
 
-        val rowComp = (_: Int, row: RowD) => {
-          tableInstance.prepareRow(row)
-          val cells = row.cells.toTagMod { cell =>
-            <.div(^.className := "td", props2Attrs(cell.getCellProps()), cell.renderCell)
+      val rowComp = (_: Int, row: RowD) => {
+        tableInstance.prepareRow(row)
+        val cells = row.cells.toTagMod { cell =>
+          <.div(^.className := "td", props2Attrs(cell.getCellProps()), cell.renderCell)
+        }
+
+        val rowClass = rowClassFn(row.index.toInt, row.original)
+        // This div is being wrapped inside the div that handles virtualization.
+        // This means the the `getRowProps` are nested an extra layer in. This does
+        // not seem to cause any issues with react-table, but could possibly be an
+        // issue with some plugins.
+        <.div(^.className := "tr", rowClass, props2Attrs(row.getRowProps()), cells)
+      }
+
+      val header = headerCellFn.fold(TagMod.empty) { f =>
+        <.div(
+          ^.className := "thead",
+          tableInstance.headerGroups.toTagMod { g =>
+            <.div(^.className := "tr",
+                  props2Attrs(g.getHeaderGroupProps()),
+                  g.headers.toTagMod(f(_))
+            )
           }
-
-          val rowClass = rowClassFn(row.index.toInt, row.original)
-          // This div is being wrapped inside the div that handles virtualization.
-          // This means the the `getRowProps` are nested an extra layer in. This does
-          // not seem to cause any issues with react-table, but could possibly be an
-          // issue with some plugins.
-          <.div(^.className := "tr", rowClass, props2Attrs(row.getRowProps()), cells)
-        }
-
-        val header = headerCellFn.fold(TagMod.empty) { f =>
-          <.div(
-            ^.className := "thead",
-            tableInstance.headerGroups.toTagMod { g =>
-              <.div(^.className := "tr",
-                    props2Attrs(g.getHeaderGroupProps()),
-                    g.headers.toTagMod(f(_))
-              )
-            }
-          )
-        }
-
-        val height = bodyHeight.fold(TagMod.empty)(h => ^.height := s"${h}px")
-        val rows   = Virtuoso[RowD](data = tableInstance.rows, itemContent = rowComp)
-
-        <.div(^.className := "table",
-              tableClass,
-              header,
-              <.div(^.className := "tbody", height, props2Attrs(bodyProps), rows)
         )
+      }
+
+      val height = bodyHeight.fold(TagMod.empty)(h => ^.height := s"${h}px")
+      val rows   = Virtuoso[RowD](data = tableInstance.rows, itemContent = rowComp)
+
+      <.div(^.className := "table",
+            tableClass,
+            header,
+            <.div(^.className := "tbody", height, props2Attrs(bodyProps), rows)
+      )
     }
 
   /**

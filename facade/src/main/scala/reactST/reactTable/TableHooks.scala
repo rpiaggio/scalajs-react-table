@@ -25,15 +25,15 @@ object TableHooks {
   def useTableJS[
     D, // format: off
     TableOptsD <: UseTableOptions[D],
-    TableInstanceType[d, col[d0], row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
-    ColumnType[d] <: Column[d],
+    TableInstanceType[d, col, row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
+    ColumnD <: Column[D],
     RowD <: Row[D],
     CellType[d, v] <: Cell[d, v],
     TableStateD <: TableState[D] // format: on
   ](
     options: TableOptsD,
     plugins: PluginHook[D]*
-  ): TableInstanceType[D, ColumnType, RowD, CellType, TableStateD] =
+  ): TableInstanceType[D, ColumnD, RowD, CellType, TableStateD] =
     js.native
 
   // According to documentation, react-table memoizes the table state.
@@ -43,9 +43,9 @@ object TableHooks {
   def useTableHook[
     D, // format: off
     TableOptsD <: UseTableOptions[D],
-    TableInstanceType[d, col[d0], row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
-    ColumnOptsType[d, v, col[d0], row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
-    ColumnType[d] <: Column[d],
+    TableInstanceType[d, col, row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
+    ColumnOptsType[d, v, col, row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
+    ColumnD <: Column[D],
     RowD <: Row[D],
     CellType[d, v] <: Cell[d, v],
     TableStateD <: TableState[D],
@@ -57,7 +57,7 @@ object TableHooks {
         TableOptsD,
         TableInstanceType,
         ColumnOptsType,
-        ColumnType,
+        ColumnD,
         RowD,
         CellType,
         TableStateD,
@@ -68,7 +68,7 @@ object TableHooks {
       .useMemoBy(_.input.data)(_ => _.toJSArray)
       .buildReturning { (props, cols, rows) =>
         val tableInstance =
-          useTableJS[D, TableOptsD, TableInstanceType, ColumnType, RowD, CellType, TableStateD](
+          useTableJS[D, TableOptsD, TableInstanceType, ColumnD, RowD, CellType, TableStateD](
             props.modOpts(props.tableDef.Options(cols, rows)),
             props.tableDef.plugins.toList.sorted.map(_.hook: PluginHook[D]): _*
           )

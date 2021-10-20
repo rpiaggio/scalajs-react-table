@@ -14,18 +14,18 @@ import scalajs.js
 @js.native
 trait TableInstance[
   D, // format: off
-  ColumnType[d],
-  RowType,
+  ColumnD,
+  RowD,
   CellType[d, v],
-  StateType // format: on
+  TableStateD // format: on
 ] extends js.Object {
-  val allColumns: js.Array[ColumnType[D]] = js.native
+  val allColumns: js.Array[ColumnD] = js.native
 
   val allColumnsHidden: Boolean = js.native
 
   val autoResetHiddenColumns: js.UndefOr[Boolean] = js.native
 
-  val columns: js.Array[ColumnType[D]] = js.native
+  val columns: js.Array[ColumnD] = js.native
 
   val data: js.Array[D] = js.native
 
@@ -33,12 +33,12 @@ trait TableInstance[
 
   val dispatch: TableDispatch[js.Any] = js.native
 
-  val flatHeaders: js.Array[ColumnType[D]] = js.native
+  val flatHeaders: js.Array[ColumnD] = js.native
 
-  val flatRows: js.Array[RowType] = js.native
+  val flatRows: js.Array[RowD] = js.native
 
   // FIXME HEaderGroups new one
-  val footerGroups: js.Array[HeaderGroup[D, ColumnType[D]]] =
+  val footerGroups: js.Array[HeaderGroup[D, ColumnD]] =
     js.native
 
   def getHooks(): Hooks[D] = js.native
@@ -47,7 +47,7 @@ trait TableInstance[
     js.Function3[
       /* originalRow */ D,
       /* relativeIndex */ Double,
-      /* parent */ js.UndefOr[RowType],
+      /* parent */ js.UndefOr[RowD],
       String
     ]
   ] = js.native
@@ -67,33 +67,33 @@ trait TableInstance[
     props: PartialTableToggleHideAll
   ): TableToggleHideAllColumnProps = js.native
 
-  val headerGroups: js.Array[HeaderGroup[D, ColumnType[D]]] =
+  val headerGroups: js.Array[HeaderGroup[D, ColumnD]] =
     js.native
 
-  val headers: js.Array[ColumnType[D]] = js.native
+  val headers: js.Array[ColumnD] = js.native
 
-  val initialState: js.UndefOr[Partial[StateType]] = js.native
+  val initialState: js.UndefOr[Partial[TableStateD]] = js.native
 
   val plugins: js.Array[PluginHook[D]] = js.native
 
-  def prepareRow(row: RowType): Unit = js.native
+  def prepareRow(row: RowD): Unit = js.native
 
-  val rows: js.Array[RowType] = js.native
+  val rows: js.Array[RowD] = js.native
 
-  val rowsById: Record[String, RowType] = js.native
+  val rowsById: Record[String, RowD] = js.native
 
   def setHiddenColumns(param: js.Array[IdType[D]]): Unit    = js.native
   def setHiddenColumns(param: UpdateHiddenColumns[D]): Unit = js.native
 
-  val state: StateType = js.native
+  val state: TableStateD = js.native
 
   val stateReducer: js.UndefOr[
     js.Function4[
-      /* newState */ StateType,
+      /* newState */ TableStateD,
       /* action */ ActionType,
-      /* previousState */ StateType,
+      /* previousState */ TableStateD,
       /* instance */ js.UndefOr[
-        TableInstance[D, ColumnType, RowType, CellType, StateType]
+        TableInstance[D, ColumnD, RowD, CellType, TableStateD]
       ],
       TableState[D]
     ]
@@ -109,11 +109,11 @@ trait TableInstance[
 
   val useControlledState: js.UndefOr[
     js.Function2[
-      /* state */ StateType,
+      /* state */ TableStateD,
       /* meta */ Meta[D, scala.Nothing, MetaBase[D]],
       TableState[D]
     ]
   ] = js.native
 
-  val visibleColumns: js.Array[ColumnType[D]] = js.native
+  val visibleColumns: js.Array[ColumnD] = js.native
 }

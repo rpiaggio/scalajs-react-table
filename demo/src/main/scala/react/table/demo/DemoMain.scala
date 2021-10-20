@@ -9,7 +9,6 @@ import reactST.reactTable.mod.SortingRule
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExportTopLevel
-import reactST.reactTable.facade.columnOptions.UseSortByColumnOptions
 
 import js.annotation._
 
@@ -21,8 +20,7 @@ object DemoMain {
   case class Details(year: Int, pickups: Int, color: String)
   case class Guitar(id: Int, make: String, model: String, details: Details)
 
-  def RowTypeClassEvenOdd[D]: (Int, D) => Css = (i, _) =>
-    if (i % 2 == 0) Css("even") else Css("odd")
+  def rowClassEvenOdd[D]: (Int, D) => Css = (i, _) => if (i % 2 == 0) Css("even") else Css("odd")
 
   val guitars =
     Reusable.always(
@@ -90,8 +88,7 @@ object DemoMain {
       .renderWithReuse((_, tableInstance) =>
         HTMLTable(SortedTableDef)(
           tableClass = Css("guitars"),
-          // headerCellFn = Some(HTMLTable.sortableHeaderCellFn()),
-          headerCellFn = Some(HTMLTable.basicHeaderCellFn()),
+          headerCellFn = Some(HTMLTable.sortableHeaderCellFn()),
           footer = <.tfoot(<.tr(<.th(^.colSpan := 6, s"Guitar Count: ${guitars.length}")))
         )(tableInstance)
       )
@@ -116,82 +113,87 @@ object DemoMain {
       )
     )
 
-  // // TABLE 2
-  // val VirtualizedTableDef = TableDef[RandomData.Person].withBlockLayout
+  // TABLE 2
+  val VirtualizedTableDef = TableDef[RandomData.Person].withBlockLayout
 
-  // val VirtualizedTable =
-  //   ScalaFnComponent
-  //     .withHooks[
-  //       (Reusable[List[ColumnInterface[RandomData.Person]]], Reusable[List[RandomData.Person]])
-  //     ]
-  //     .useTableBy { case (cols, data) => VirtualizedTableDef(cols, data) }
-  //     .render((_, tableInstance) =>
-  //       HTMLTable.virtualized(VirtualizedTableDef)(
-  //         tableClass = Css("virtualized"),
-  //         RowTypeClassFn = RowTypeClassEvenOdd,
-  //         headerCellFn = Some(HTMLTable.basicHeaderCellFn(useDiv = true))
-  //       )(tableInstance)
-  //     )
+  val VirtualizedTable =
+    ScalaFnComponent
+      .withHooks[
+        (Reusable[List[VirtualizedTableDef.Type.ColumnOptions[_]]],
+         Reusable[List[RandomData.Person]]
+        )
+      ]
+      .useTableBy { case (cols, data) => VirtualizedTableDef(cols, data) }
+      .render((_, tableInstance) =>
+        HTMLTable.virtualized(VirtualizedTableDef)(
+          tableClass = Css("virtualized"),
+          rowClassFn = rowClassEvenOdd,
+          headerCellFn = Some(HTMLTable.basicHeaderCellFn(useDiv = true))
+        )(tableInstance)
+      )
 
-  // val virtualizedTableColumns = Reusable.always(
-  //   List(
-  //     VirtualizedTableDef.Column("first", _.first).setHeader("First").setWidth(100),
-  //     VirtualizedTableDef.Column("last", _.last).setHeader("Last").setWidth(100),
-  //     VirtualizedTableDef.Column("age", _.age).setHeader("Age").setWidth(50)
-  //   )
-  // )
+  val virtualizedTableColumns = Reusable.always(
+    List(
+      VirtualizedTableDef.Column("first", _.first).setHeader("First").setWidth(100),
+      VirtualizedTableDef.Column("last", _.last).setHeader("Last").setWidth(100),
+      VirtualizedTableDef.Column("age", _.age).setHeader("Age").setWidth(50)
+    )
+  )
 
-  // // TABLE 3
-  // val SortedVirtualizedTableDef = TableDef[RandomData.Person].withSort.withBlockLayout
+  // TABLE 3
+  val SortedVirtualizedTableDef = TableDef[RandomData.Person].withSortBy.withBlockLayout
 
-  // val SortedVirtualizedTable =
-  //   ScalaFnComponent
-  //     .withHooks[
-  //       (Reusable[List[ColumnInterface[RandomData.Person]]], Reusable[List[RandomData.Person]])
-  //     ]
-  //     .useTableBy { case (cols, data) => SortedVirtualizedTableDef(cols, data) }
-  //     .render((_, tableInstance) =>
-  //       HTMLTable.virtualized(SortedVirtualizedTableDef)(
-  //         tableClass = Css("virtualized"),
-  //         headerCellFn = Some(HTMLTable.sortableHeaderCellFn(useDiv = true))
-  //       )(tableInstance)
-  //     )
+  val SortedVirtualizedTable =
+    ScalaFnComponent
+      .withHooks[
+        (Reusable[List[SortedVirtualizedTableDef.Type.ColumnOptions[_]]],
+         Reusable[List[RandomData.Person]]
+        )
+      ]
+      .useTableBy { case (cols, data) => SortedVirtualizedTableDef(cols, data) }
+      .render((_, tableInstance) =>
+        HTMLTable.virtualized(SortedVirtualizedTableDef)(
+          tableClass = Css("virtualized"),
+          headerCellFn = Some(HTMLTable.sortableHeaderCellFn(useDiv = true))
+        )(tableInstance)
+      )
 
-  // val sortedVirtualizedTableColumns = Reusable.always(
-  //   List(
-  //     SortedVirtualizedTableDef.Column("first", _.first).setHeader("First").setWidth(100),
-  //     SortedVirtualizedTableDef.Column("last", _.last).setHeader("Last").setWidth(100),
-  //     SortedVirtualizedTableDef.Column("age", _.age).setHeader("Age").setWidth(75)
-  //   )
-  // )
+  val sortedVirtualizedTableColumns = Reusable.always(
+    List(
+      SortedVirtualizedTableDef.Column("first", _.first).setHeader("First").setWidth(100),
+      SortedVirtualizedTableDef.Column("last", _.last).setHeader("Last").setWidth(100),
+      SortedVirtualizedTableDef.Column("age", _.age).setHeader("Age").setWidth(75)
+    )
+  )
 
-  // // Table 4
-  // val SortedVariableVirtualizedTableDef = TableDef[RandomData.Person].withSort.withBlockLayout
+  // Table 4
+  val SortedVariableVirtualizedTableDef = TableDef[RandomData.Person].withSortBy.withBlockLayout
 
-  // val SortedVariableVirtualizedTable =
-  //   ScalaFnComponent
-  //     .withHooks[
-  //       (Reusable[List[ColumnInterface[RandomData.Person]]], Reusable[List[RandomData.Person]])
-  //     ]
-  //     .useTableBy { case (cols, data) => SortedVariableVirtualizedTableDef(cols, data) }
-  //     .render((_, tableInstance) =>
-  //       HTMLTable.virtualized(SortedVariableVirtualizedTableDef)(
-  //         tableClass = Css("virtualized"),
-  //         bodyHeight = Some(300), // make this one a different height
-  //         headerCellFn = Some(HTMLTable.sortableHeaderCellFn(useDiv = true)),
-  //         RowTypeClassFn =
-  //           (_: Int, p: RandomData.Person) => if (p.id % 2 == 0) Css("") else Css("big")
-  //       )(tableInstance)
-  //     )
+  val SortedVariableVirtualizedTable =
+    ScalaFnComponent
+      .withHooks[
+        (Reusable[List[SortedVariableVirtualizedTableDef.Type.ColumnOptions[_]]],
+         Reusable[List[RandomData.Person]]
+        )
+      ]
+      .useTableBy { case (cols, data) => SortedVariableVirtualizedTableDef(cols, data) }
+      .render((_, tableInstance) =>
+        HTMLTable.virtualized(SortedVariableVirtualizedTableDef)(
+          tableClass = Css("virtualized"),
+          bodyHeight = Some(300), // make this one a different height
+          headerCellFn = Some(HTMLTable.sortableHeaderCellFn(useDiv = true)),
+          rowClassFn = (_: Int, p: RandomData.Person) => if (p.id % 2 == 0) Css("") else Css("big")
+        )(tableInstance)
+      )
 
-  // val sortedVariableVirtualizedTableColumns = Reusable.always(
-  //   List(
-  //     SortedVariableVirtualizedTableDef.Column("id", _.id).setHeader("Id").setWidth(50),
-  //     SortedVariableVirtualizedTableDef.Column("first", _.first).setHeader("First").setWidth(100),
-  //     SortedVariableVirtualizedTableDef.Column("last", _.last).setHeader("Last").setWidth(100),
-  //     SortedVariableVirtualizedTableDef.Column("age", _.age).setHeader("Age").setWidth(75)
-  //   )
-  // )
+  val sortedVariableVirtualizedTableColumns = Reusable.always(
+    List(
+      SortedVariableVirtualizedTableDef.Column("id", _.id).setHeader("Id").setWidth(50),
+      SortedVariableVirtualizedTableDef.Column("first", _.first).setHeader("First").setWidth(100),
+      SortedVariableVirtualizedTableDef.Column("last", _.last).setHeader("Last").setWidth(100),
+      SortedVariableVirtualizedTableDef.Column("age", _.age).setHeader("Age").setWidth(75)
+    )
+  )
 
   @JSExport
   def main(): Unit = {
@@ -209,14 +211,14 @@ object DemoMain {
       BaseTable((baseTableColumns, guitars)),
       <.h2("Sortable table"),
       SortedTable((sortedTableColumns, guitars)),
-      "Click header to sort. Shift-Click for multi-sort."
-      // <.h2("Virtualized Table"),
-      // VirtualizedTable((virtualizedTableColumns, randomData))
-      // <.h2("Sortable Virtualized Table"),
-      // SortedVirtualizedTable((sortedVirtualizedTableColumns, randomData)),
-      // <.h2("Sortable Variable RowType Height Virtualized Table"),
-      // <.h3("RowTypes with odd id's are taller via CSS."),
-      // SortedVariableVirtualizedTable((sortedVariableVirtualizedTableColumns, randomData))
+      "Click header to sort. Shift-Click for multi-sort.",
+      <.h2("Virtualized Table"),
+      VirtualizedTable((virtualizedTableColumns, randomData)),
+      <.h2("Sortable Virtualized Table"),
+      SortedVirtualizedTable((sortedVirtualizedTableColumns, randomData)),
+      <.h2("Sortable Variable RowType Height Virtualized Table"),
+      <.h3("RowTypes with odd id's are taller via CSS."),
+      SortedVariableVirtualizedTable((sortedVariableVirtualizedTableColumns, randomData))
     )
       .renderIntoDOM(container)
 

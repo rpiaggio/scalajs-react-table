@@ -11,11 +11,11 @@ import reactST.reactTable.mod.DefaultSortTypes
 trait UseSortByColumnOptions[ // format: off
   D,
   V,
-  ColumnType[d],
-  RowType,
+  ColumnD,
+  RowD,
   CellType[d, v],
-  StateType // format: on
-] extends ColumnOptions[D, V, ColumnType, RowType, CellType, StateType] {
+  TableStateD // format: on
+] extends ColumnOptions[D, V, ColumnD, RowD, CellType, TableStateD] {
   var defaultCanSort: js.UndefOr[Boolean] = js.native
 
   var disableSortBy: js.UndefOr[Boolean] = js.native
@@ -32,15 +32,13 @@ object UseSortByColumnOptions {
   implicit class ColumnOptionsMutableBuilder[
     D, // format: off
     V,
-    ColumnType[d],
+    ColumnD,
     RowD,
     CellType[d, v],
     TableStateD,
     Self
-    // ColumnOptionsType[d, v, col[d0], row, cell[d0, v], s] <: UseSortByColumnOptions[d, v, col, row, cell, s] // format: on
-  ](val colOpts: Self with UseSortByColumnOptions[D, V, ColumnType, RowD, CellType, TableStateD])//ColumnOptionsType[D, V, ColumnType, RowType, CellType, StateType])
+  ](val colOpts: Self with UseSortByColumnOptions[D, V, ColumnD, RowD, CellType, TableStateD])//ColumnOptionsType[D, V, ColumnType, RowType, CellType, StateType])
       extends AnyVal {
-    // type Self = ColumnOptionsType[D, V, ColumnType, RowType, CellType, StateType]
 
     /**
      * Sets the sorting for the column based on a function on its value.

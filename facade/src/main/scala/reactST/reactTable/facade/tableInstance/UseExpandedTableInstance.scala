@@ -7,18 +7,18 @@ import scala.scalajs.js
 @js.native
 trait UseExpandedTableInstance[
   D, // format: off
-  ColumnType[d],
-  RowType,
+  ColumnD,
+  RowD,
   CellType[d, v],
-  StateType // format: on
-] extends TableInstance[D, ColumnType, RowType, CellType, StateType] {
+  TableStateD // format: on
+] extends TableInstance[D, ColumnD, RowD, CellType, TableStateD] {
   var expandedDepth: Double = js.native
 
-  var expandedRowTypes: js.Array[RowType] = js.native
+  var expandedRowTypes: js.Array[RowD] = js.native
 
   var isAllRowTypesExpanded: Boolean = js.native
 
-  var preExpandedRowTypes: js.Array[RowType] = js.native
+  var preExpandedRowTypes: js.Array[RowD] = js.native
 
   def toggleAllRowTypesExpanded(): Unit               = js.native
   def toggleAllRowTypesExpanded(value: Boolean): Unit = js.native
