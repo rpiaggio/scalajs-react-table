@@ -2,7 +2,6 @@ package reactST.reactTable
 
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.hooks.CustomHook
-import reactST.reactTable.mod.RowType
 import reactST.reactTable.mod.Cell
 import reactST.reactTable.mod.TableState
 import reactST.reactTable.mod.UseTableOptions
@@ -16,6 +15,7 @@ import scala.scalajs.js.annotation.JSGlobalScope
 import scala.scalajs.js.annotation.JSImport
 import scala.scalajs.js.annotation.JSName
 import scala.scalajs.js.`|`
+import reactST.reactTable.mod.Row
 
 import scalajs.js.JSConverters._
 
@@ -24,16 +24,16 @@ object TableHooks {
   @js.native
   def useTableJS[
     D, // format: off
-    TableInstanceD[d, co, col, RowType, cell[d0, v], s] <: TableInstance[d, co, col, RowType, cell, s],
-    ColumnOptsD, 
-    ColumnObjectD, 
-    RowTypeD, 
-    CellType[d0, v] <: Cell[d0, v], 
-    StateType, 
-  ]( // format: on
-    options: TableOptions[D],
+    TableOptsD <: UseTableOptions[D],
+    TableInstanceType[d, col[d0], row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
+    ColumnType[d] <: Column[d],
+    RowD <: Row[D],
+    CellType[d, v] <: Cell[d, v],
+    TableStateD <: TableState[D] // format: on
+  ](
+    options: TableOptsD,
     plugins: PluginHook[D]*
-  ): TableInstanceD[D, ColumnOptsD, ColumnObjectD, RowTypeD, CellType, StateType] =
+  ): TableInstanceType[D, ColumnType, RowD, CellType, TableStateD] =
     js.native
 
   // According to documentation, react-table memoizes the table state.
@@ -41,45 +41,39 @@ object TableHooks {
     Reusability.byRef
 
   def useTableHook[
-    D,
+    D, // format: off
     TableOptsD <: UseTableOptions[D],
-    TableInstanceD[d, co, col, RowType, cell[d0, v], s] <: TableInstance[d,
-                                                                         co,
-                                                                         col,
-                                                                         RowType,
-                                                                         cell,
-                                                                         s
-    ],
-    ColumnOptsD <: ColumnOptions[D],
-    ColumnObjectD <: ColumnObject[D],
-    RowTypeD <: RowType[D],
-    CellType[d0, v] <: Cell[d0, v],
-    StateType <: TableState[D],
-    Layout
+    TableInstanceType[d, col[d0], row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
+    ColumnOptsType[d, v, col[d0], row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
+    ColumnType[d] <: Column[d],
+    RowD <: Row[D],
+    CellType[d, v] <: Cell[d, v],
+    TableStateD <: TableState[D],
+    Layout // format: on
   ] =
     CustomHook[
       TableDefWithOptions[
         D,
         TableOptsD,
-        TableInstanceD,
-        ColumnOptsD,
-        ColumnObjectD,
-        RowTypeD,
+        TableInstanceType,
+        ColumnOptsType,
+        ColumnType,
+        RowD,
         CellType,
-        StateType,
+        TableStateD,
         Layout
       ]
     ]
       .useMemoBy(_.cols)(_ => _.toJSArray)
       .useMemoBy(_.input.data)(_ => _.toJSArray)
-      .buildReturning { (props, cols, RowTypes) =>
+      .buildReturning { (props, cols, rows) =>
         val tableInstance =
-          useTableJS[D, TableInstanceD, ColumnOptsD, ColumnObjectD, RowTypeD, CellType, StateType](
-            props.modOpts(props.tableDef.Options(cols, RowTypes)),
+          useTableJS[D, TableOptsD, TableInstanceType, ColumnType, RowD, CellType, TableStateD](
+            props.modOpts(props.tableDef.Options(cols, rows)),
             props.tableDef.plugins.toList.sorted.map(_.hook: PluginHook[D]): _*
           )
         Reusable
-          .implicitly((cols, RowTypes, props.modOpts, tableInstance.state))
+          .implicitly((cols, rows, props.modOpts, tableInstance.state))
           .withValue(tableInstance)
       }
 

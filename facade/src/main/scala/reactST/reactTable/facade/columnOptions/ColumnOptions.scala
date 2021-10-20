@@ -91,17 +91,6 @@ trait ColumnOptions[ // format: off
 object ColumnOptions {
 
   @scala.inline
-  def apply[ // format: off
-    D,
-    V,
-    ColumnType[d],
-    RowType,
-    CellType[d, v],
-    StateType // format: on
-  ](): ColumnOptions[D, V, ColumnType, RowType, CellType, StateType] =
-    js.Dynamic.literal().asInstanceOf[ColumnOptions[D, V, ColumnType, RowType, CellType, StateType]]
-
-  @scala.inline
   implicit class ColumnOptionsMutableBuilder[
     D,
     V,

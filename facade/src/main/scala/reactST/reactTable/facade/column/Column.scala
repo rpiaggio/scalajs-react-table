@@ -12,10 +12,10 @@ import reactST.reactTable.mod.FooterPropGetter
 import reactST.reactTable.mod.TableHeaderProps
 import reactST.reactTable.mod.HeaderPropGetter
 import reactST.reactTable.mod.IdType
+import reactST.reactTable.mod.Renderer
 
 @js.native
 trait Column[D] extends js.Object {
-
   var columns: js.UndefOr[js.Array[Column[D]]] = js.native
 
   var depth: Double = js.native
@@ -56,4 +56,11 @@ trait Column[D] extends js.Object {
   var totalLeft: Double = js.native
 
   var totalWidth: Double = js.native
+}
+
+object Column {
+  implicit class ColumnOps(val col: Column[_]) extends AnyVal {
+    def renderHeader: Node = col.render_Header(Header)
+    def renderFooter: Node = col.render_Footer(Footer)
+  }
 }
