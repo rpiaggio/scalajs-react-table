@@ -35,17 +35,41 @@ object DemoMain {
   val randomData = Reusable.always(RandomData.randomPeople(1000))
 
   // TABLE 0
-  val BaseTableDef = TableDef[Guitar]
+  val BaseTableDef = TableDef[Guitar].withBlockLayout.withExpanded.withSortBy // THIS DOESN'T WORK
+  // val BaseTableDef = TableDef[Guitar].withBlockLayout.withExpanded // THIS WORKS
   val BaseTable    =
     ScalaFnComponent
       .withHooks[
         (Reusable[List[BaseTableDef.Type.ColumnOptions]], Reusable[List[Guitar]])
       ]
       .useTableBy { case (cols, data) =>
-        BaseTableDef(cols, data)
+        val xxx = BaseTableDef(cols, data)
+        xxx
       }
       .renderWithReuse((_, tableInstance) =>
-        HTMLTable(BaseTableDef)(
+        HTMLTable /*[ // FORCED TYPES, STILL DOESN'T WORK
+          Guitar,
+          reactST.reactTable.mod.UseTableOptions[
+            react.table.demo.DemoMain.Guitar
+          ] with reactST.reactTable.mod.UseExpandedOptions[
+            react.table.demo.DemoMain.Guitar
+          ] with reactST.reactTable.mod.UseSortByOptions[react.table.demo.DemoMain.Guitar],
+          reactST.reactTable.TableInstance with reactST.reactTable.UseExpandedTableInstance with reactST.reactTable.UseSortByTableInstance,
+          reactST.reactTable.ColumnOptions with reactST.reactTable.UseSortByColumnOptions,
+          reactST.reactTable.facade.column.Column[
+            react.table.demo.DemoMain.Guitar
+          ] with reactST.reactTable.facade.column.UseSortByColumn[react.table.demo.DemoMain.Guitar],
+          reactST.reactTable.mod.UseTableRowProps[
+            react.table.demo.DemoMain.Guitar
+          ] with reactST.reactTable.mod.UseExpandedRowProps[react.table.demo.DemoMain.Guitar],
+          reactST.reactTable.Cell,
+          reactST.reactTable.mod.TableState[
+            react.table.demo.DemoMain.Guitar
+          ] with reactST.reactTable.mod.UseExpandedState[
+            react.table.demo.DemoMain.Guitar
+          ] with reactST.reactTable.mod.UseSortByState[react.table.demo.DemoMain.Guitar],
+          Layout.NonTable
+        ]*/ (BaseTableDef)(
           tableClass = Css("guitars"),
           headerCellFn = Some(HTMLTable.basicHeaderCellFn()),
           footer = <.tfoot(<.tr(<.th(^.colSpan := 6, s"Guitar Count: ${guitars.length}")))
@@ -165,18 +189,19 @@ object DemoMain {
   )
 
   // Table 4
-  val SortedVariableVirtualizedTableDef =
-    TableDef[RandomData.Person].withSortBy.withBlockLayout.withResizeColumns
 
-// D,
-//      TableOptsD <: UseTableOptions[D],
-//      TableInstanceType[d, col, row, cell, s] <: TableInstance[d, col, row, cell, s],
-//      ColumnOptsType[d, v, col, row, cell, s] <: ColumnOptions[d, v, col, row, cell, s],
-//      ColumnD <: Column[D],
-//      RowD <: Row[D],
-//      CellType[d, v] <: Cell[d, v],
-//      TableStateD <: TableState[D],
-//      Layout
+  // D,
+  //      TableOptsD <: UseTableOptions[D],
+  //      TableInstanceType[d, col, row, cell, s] <: TableInstance[d, col, row, cell, s],
+  //      ColumnOptsType[d, v, col, row, cell, s] <: ColumnOptions[d, v, col, row, cell, s],
+  //      ColumnD <: Column[D],
+  //      RowD <: Row[D],
+  //      CellType[d, v] <: Cell[d, v],
+  //      TableStateD <: TableState[D],
+  //      Layout
+
+  val SortedVariableVirtualizedTableDef =
+    TableDef[RandomData.Person].withSortBy.withBlockLayout //.withResizeColumns
 
   val SortedVariableVirtualizedTable =
     ScalaFnComponent

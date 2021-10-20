@@ -7,7 +7,7 @@ import scala.scalajs.js.annotation.{ JSBracketAccess, JSGlobal, JSGlobalScope, J
 import reactST.reactTable.facade.tableInstance.TableInstance
 
 @js.native
-trait CellProps[D, V, ColumnD, RowD, CellType[d0, col0, row0], StateType]
+trait CellProps[D, V, ColumnD, RowD, CellType[_, _, _], StateType]
     extends TableInstance[D, ColumnD, RowD, CellType, StateType] {
   val cell: CellType[D, ColumnD, RowD] with CellValue[V] = js.native
 

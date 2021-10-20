@@ -24,7 +24,7 @@ object TableHooks {
   def useTableJS[
     D, // format: off
     TableOptsD <: UseTableOptions[D],
-    TableInstanceType[d, col, row, cell[d0, col0, row0], s] <: TableInstance[d, col, row, cell, s],
+    TableInstanceType[d, col, row, cell[_, _, _], s] <: TableInstance[d, col, row, cell, s],
     ColumnD <: Column[D],
     RowD <: Row[D],
     CellType[d, col, row] <: Cell[d, col, row],
@@ -42,8 +42,8 @@ object TableHooks {
   def useTableHook[
     D, // format: off
     TableOptsD <: UseTableOptions[D],
-    TableInstanceType[d, col, row, cell[d0, col0, row0], s] <: TableInstance[d, col, row, cell, s],
-    ColumnOptsType[d, col, row, cell[d0, col0, row0], s] <: ColumnOptions[d, col, row, cell, s],
+    TableInstanceType[d, col, row, cell[_, _, _], s] <: TableInstance[d, col, row, cell, s],
+    ColumnOptsType[d, col, row, cell[_, _, _], s] <: ColumnOptions[d, col, row, cell, s],
     ColumnD <: Column[D],
     RowD <: Row[D],
     CellType[d, col, row] <: Cell[d, col, row],

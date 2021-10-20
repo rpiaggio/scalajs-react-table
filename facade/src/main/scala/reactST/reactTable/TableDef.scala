@@ -43,8 +43,8 @@ import scalajs.js.JSConverters._
 case class TableDefWithOptions[ // format: off
   D,
   TableOptsD <: UseTableOptions[D],
-  TableInstanceType[d, col, row, cell[d0, col0, row0], s] <: TableInstance[d, col, row, cell, s],
-  ColumnOptsType[d, col, row, cell[d0, col0, row0], s] <: ColumnOptions[d, col, row, cell, s],
+  TableInstanceType[d, col, row, cell[_, _, _], s] <: TableInstance[d, col, row, cell, s],
+  ColumnOptsType[d, col, row, cell[_, _, _], s] <: ColumnOptions[d, col, row, cell, s],
   ColumnD <: Column[D],
   RowD <: Row[D],
   CellType[d, col, row] <: Cell[d, col, row],
@@ -70,8 +70,8 @@ case class TableDefWithOptions[ // format: off
 case class TableDef[ // format: off
   D,
   TableOptsD <: UseTableOptions[D],
-  TableInstanceType[d, col, row, cell[d0, col0, row0], s] <: TableInstance[d, col, row, cell, s],
-  ColumnOptsType[d, col, row, cell[d0, col0, row0], s] <: ColumnOptions[d, col, row, cell, s],
+  TableInstanceType[d, col, row, cell[_, _, _], s] <: TableInstance[d, col, row, cell, s],
+  ColumnOptsType[d, col, row, cell[_, _, _], s] <: ColumnOptions[d, col, row, cell, s],
   ColumnD <: Column[D],
   RowD <: Row[D],
   CellType[d, col, row] <: Cell[d, col, row],
@@ -79,20 +79,21 @@ case class TableDef[ // format: off
   Layout // format: on
 ](plugins: Set[Plugin]) {
   object Type {
-    type Options                                              = TableOptsD
-    type InstanceC[d, col, row, cell[d0, col0, row0], s]      = TableInstanceType[d, col, row, cell, s]
-    type Instance                                             = InstanceC[D, ColumnD, RowD, CellType, TableStateD]
-    type ColumnOptionsC[d, col, row, cell[d0, col0, row0], s] = ColumnOptsType[d, col, row, cell, s]
-    type ColumnOptions                                        = ColumnOptionsC[D, ColumnD, RowD, CellType, TableStateD]
-    type ColumnValueOptions[V]                                =
+    type Options                                       = TableOptsD
+    type InstanceC[d, col, row, cell[_, _, _], s]      = TableInstanceType[d, col, row, cell, s]
+    type Instance                                      = InstanceC[D, ColumnD, RowD, CellType, TableStateD]
+    type ColumnOptionsC[d, col, row, cell[_, _, _], s] = ColumnOptsType[d, col, row, cell, s]
+    type ColumnOptions                                 = ColumnOptionsC[D, ColumnD, RowD, CellType, TableStateD]
+    type ColumnValueOptions[V]                         =
       ColumnOptionsV[D, V, ColumnD, RowD, CellType, TableStateD, ColumnOptions]
-    type ColumnGroupOptions                                   =
+    type ColumnGroupOptions                            =
       ColumnOptsType[D, ColumnD, RowD, CellType, TableStateD] // TODO Proper col group type
-    type Column       = ColumnD
-    type Row          = RowD
-    type Cell         = CellType[D, ColumnD, RowD]
-    type CellValue[V] = Cell with reactST.reactTable.facade.cell.CellValue[V]
-    type TableState   = TableStateD
+    type Column             = ColumnD
+    type Row                = RowD
+    type CellC[d, col, row] = CellType[d, col, row]
+    type Cell               = CellC[D, ColumnD, RowD]
+    type CellValue[V]       = Cell with reactST.reactTable.facade.cell.CellValue[V]
+    type TableState         = TableStateD
   }
 
   import syntax._
@@ -214,8 +215,8 @@ case class TableDef[ // format: off
 
   protected[reactST] def withFeaturePlugin[ // format: off
     NewTableOptsD <: UseTableOptions[D],
-    NewTableInstanceD[d, col, row, cell[d0, col0, row0], s] <: TableInstance[d, col, row, cell, s],
-    NewColumnOptsType[d, col, row, cell[d0, col0, row0], s] <: ColumnOptions[d, col, row, cell, s],
+    NewTableInstanceD[d, col, row, cell[_, _, _], s] <: TableInstance[d, col, row, cell, s],
+    NewColumnOptsType[d, col, row, cell[_, _, _], s] <: ColumnOptions[d, col, row, cell, s],
     NewColumnD <: Column[D],
     NewRowD <: Row[D],
     NewCellType[d, col, row] <: Cell[d, col, row],
@@ -232,6 +233,26 @@ case class TableDef[ // format: off
              Layout
     ](plugins + plugin)
 
+  protected[reactST] def withLayoutPlugin[
+    NewTableOptsD <: UseTableOptions[D], // format: off
+      NewTableInstanceType[d, col, row, cell[_, _, _], s] <: TableInstance[d, col, row, cell, s],
+      NewColumnOptsType[d, col, row, cell[_, _, _], s] <: ColumnOptions[d, col, row, cell, s],
+      NewColumnD <: Column[D],
+      NewRowD <: Row[D],
+      NewCellType[d, col, row] <: Cell[d, col, row],
+      NewTableStateD <: TableState[D] // format: on
+  ](plugin: Plugin) =
+    TableDef[D,
+             NewTableOptsD,
+             NewTableInstanceType,
+             NewColumnOptsType,
+             NewColumnD,
+             NewRowD,
+             NewCellType,
+             NewTableStateD,
+             Layout.NonTable
+    ](plugins + plugin)
+
   /**
    * Add sort capabilities to the table via the useSortBy plugin hook.
    */
@@ -245,6 +266,17 @@ case class TableDef[ // format: off
     TableStateD with UseSortByState[D]
   ](Plugin.SortBy)
 
+  // only nontable
+  def withResizeColumns = withFeaturePlugin[
+    TableOptsD with UseResizeColumnsOptions[D],
+    TableInstanceType,
+    ColumnOptsType with UseResizeColumnsColumnOptions,
+    ColumnD with UseResizeColumnsColumn[D],
+    RowD,
+    CellType,
+    TableStateD with UseResizeColumnsState[D]
+  ](Plugin.ResizeColumns)
+
   /**
    * Add capabilities to expand rows of the table via the useExpanded plugin hook.
    */
@@ -257,6 +289,17 @@ case class TableDef[ // format: off
     CellType,
     TableStateD with UseExpandedState[D]
   ](Plugin.Expanded)
+
+  // only table
+  def withBlockLayout = withLayoutPlugin[
+    TableOptsD,
+    TableInstanceType,
+    ColumnOptsType,
+    ColumnD,
+    RowD,
+    CellType,
+    TableStateD
+  ](Plugin.BlockLayout)
 
   // When trying to use a more traditional "syntax" package and implicit
   // classes, the compiler seems to somehow loose type information along
@@ -362,8 +405,8 @@ object TableDef {
   implicit class TableLayoutTableDefOps[ // format: off
     D,
     TableOptsD <: UseTableOptions[D],
-    TableInstanceType[d, col, row, cell[d0, col0, row0], s] <: TableInstance[d, col, row, cell, s],
-    ColumnOptsType[d, col, row, cell[d0, col0, row0], s] <: ColumnOptions[d, col, row, cell, s],
+    TableInstanceType[d, col, row, cell[_, _, _], s] <: TableInstance[d, col, row, cell, s],
+    ColumnOptsType[d, col, row, cell[_, _, _], s] <: ColumnOptions[d, col, row, cell, s],
     ColumnD <: Column[D],
     RowD <: Row[D],
     CellType[d, col, row] <: Cell[d, col, row],
@@ -382,8 +425,8 @@ object TableDef {
   ]) extends AnyVal { 
     private def withLayoutPlugin[
       NewTableOptsD <: UseTableOptions[D],
-      NewTableInstanceType[d, col, row, cell[d0, col0, row0], s] <: TableInstance[d, col, row, cell, s],
-      NewColumnOptsType[d, col, row, cell[d0, col0, row0], s] <: ColumnOptions[d, col, row, cell, s],
+      NewTableInstanceType[d, col, row, cell[_, _, _], s] <: TableInstance[d, col, row, cell, s],
+      NewColumnOptsType[d, col, row, cell[_, _, _], s] <: ColumnOptions[d, col, row, cell, s],
       NewColumnD <: Column[D],
       NewRowD <: Row[D],
       NewCellType[d, col, row] <: Cell[d, col, row],
@@ -409,15 +452,15 @@ object TableDef {
      * options width, minWidth and maxWidth are used to calculate column and cell widths and must be
      * set.
      */
-    def withBlockLayout = withLayoutPlugin[
-      TableOptsD,
-      TableInstanceType,
-      ColumnOptsType,
-      ColumnD,
-      RowD,
-      CellType,
-      TableStateD
-    ](Plugin.BlockLayout)
+    // def withBlockLayout = withLayoutPlugin[
+    //   TableOptsD,
+    //   TableInstanceType,
+    //   ColumnOptsType,
+    //   ColumnD,
+    //   RowD,
+    //   CellType,
+    //   TableStateD
+    // ](Plugin.BlockLayout)
 
     /**
      * Adds support for headers and cells to be rendered as divs (or other non-table elements) with
@@ -437,42 +480,42 @@ object TableDef {
     ](Plugin.GridLayout)
   }
 
-  implicit class NonTableLayoutTableDefOps[ // format: off
-    D, 
-    TableOptsD <: UseTableOptions[D],
-    TableInstanceType[d, col, row, cell[d0, col0, row0], s] <: TableInstance[d, col, row, cell, s],
-    ColumnOptsType[d, col, row, cell[d0, col0, row0], s] <: ColumnOptions[d, col, row, cell, s],
-    ColumnD <: Column[D],
-    RowD <: Row[D],
-    CellType[d, col, row] <: Cell[d, col, row],
-    TableStateD <: TableState[D] // format: on
-  ](
-    val tableDef: TableDef[
-      D,
-      TableOptsD,
-      TableInstanceType,
-      ColumnOptsType,
-      ColumnD,
-      RowD,
-      CellType,
-      TableStateD,
-      Layout.NonTable
-    ]
-  ) extends AnyVal {
+  // implicit class NonTableLayoutTableDefOps[ // format: off
+  //   D,
+  //   TableOptsD <: UseTableOptions[D],
+  //   TableInstanceType[d, col, row, cell[_, _, _], s] <: TableInstance[d, col, row, cell, s],
+  //   ColumnOptsType[d, col, row, cell[_, _, _], s] <: ColumnOptions[d, col, row, cell, s],
+  //   ColumnD <: Column[D],
+  //   RowD <: Row[D],
+  //   CellType[d, col, row] <: Cell[d, col, row],
+  //   TableStateD <: TableState[D] // format: on
+  // ](
+  //   val tableDef: TableDef[
+  //     D,
+  //     TableOptsD,
+  //     TableInstanceType,
+  //     ColumnOptsType,
+  //     ColumnD,
+  //     RowD,
+  //     CellType,
+  //     TableStateD,
+  //     Layout.NonTable
+  //   ]
+  // ) extends AnyVal {
 
-    /**
-     * Add column resize capabilities to the table via the useResizeColumns plugin hook.
-     */
-    def withResizeColumns = tableDef.withFeaturePlugin[
-      TableOptsD with UseResizeColumnsOptions[D],
-      TableInstanceType,
-      ColumnOptsType with UseResizeColumnsColumnOptions,
-      ColumnD with UseResizeColumnsColumn[D],
-      RowD,
-      CellType,
-      TableStateD with UseResizeColumnsState[D]
-    ](Plugin.ResizeColumns)
-  }
+  //   /**
+  //    * Add column resize capabilities to the table via the useResizeColumns plugin hook.
+  //    */
+  //   def withResizeColumns = tableDef.withFeaturePlugin[
+  //     TableOptsD with UseResizeColumnsOptions[D],
+  //     TableInstanceType,
+  //     ColumnOptsType with UseResizeColumnsColumnOptions,
+  //     ColumnD with UseResizeColumnsColumn[D],
+  //     RowD,
+  //     CellType,
+  //     TableStateD with UseResizeColumnsState[D]
+  //   ](Plugin.ResizeColumns)
+  // }
   // format: on
 
 }

@@ -3,26 +3,26 @@ package reactST
 // import reactST.reactTable.mod._
 
 package object reactTable extends HooksApiExt {
-  type TableInstance[d, col, row, cell[d0, col0, row0], s]            =
+  type TableInstance[d, col, row, cell[_, _, _], s]            =
     facade.tableInstance.TableInstance[d, col, row, cell, s]
-  type UseSortByTableInstance[d, col, row, cell[d0, col0, row0], s]   =
+  type UseSortByTableInstance[d, col, row, cell[_, _, _], s]   =
     facade.tableInstance.UseSortByTableInstance[d, col, row, cell, s]
-  type UseExpandedTableInstance[d, col, row, cell[d0, col0, row0], s] =
+  type UseExpandedTableInstance[d, col, row, cell[_, _, _], s] =
     facade.tableInstance.UseExpandedTableInstance[d, col, row, cell, s]
 
-  type ColumnOptions[d, col, row, cell[d0, col0, row0], s]                 =
+  type ColumnOptions[d, col, row, cell[_, _, _], s]                 =
     facade.columnOptions.ColumnOptions[d, col, row, cell, s]
-  type UseSortByColumnOptions[d, col, row, cell[d0, col0, row0], s]        =
+  type UseSortByColumnOptions[d, col, row, cell[_, _, _], s]        =
     facade.columnOptions.UseSortByColumnOptions[d, col, row, cell, s]
-  type UseResizeColumnsColumnOptions[d, col, row, cell[d0, col0, row0], s] =
+  type UseResizeColumnsColumnOptions[d, col, row, cell[_, _, _], s] =
     facade.columnOptions.UseSortByColumnOptions[d, col, row, cell, s]
 
   // format: off
-  type ColumnOptionsV[d, v, col, row, cell[d0, col0, row0], s, Col <: ColumnOptions[d, col, row, cell, s]] =
+  type ColumnOptionsV[d, v, col, row, cell[_, _, _], s, Col <: ColumnOptions[d, col, row, cell, s]] =
     Col with facade.columnOptions.ColumnValueOptions[d, v, col, row, cell, s]
   // format: on
 
-  type ColumnGroupOptions[d, col, row, cell[d0, col0, row0], s] =
+  type ColumnGroupOptions[d, col, row, cell[_, _, _], s] =
     facade.columnOptions.ColumnOptions[d, col, row, cell, s]
 
   type Column[d]                 = facade.column.Column[d]

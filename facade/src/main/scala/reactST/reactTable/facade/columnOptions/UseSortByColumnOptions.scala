@@ -9,9 +9,7 @@ import reactST.reactTable.mod.DefaultSortTypes
 
 @js.native
 trait UseSortByColumnOptions[D, ColumnD, RowD, CellType[d, col, row], TableStateD]
-    extends js.Object {
-  _: ColumnOptions[D, ColumnD, RowD, CellType, TableStateD] =>
-
+    extends ColumnOptions[D, ColumnD, RowD, CellType, TableStateD] {
   var defaultCanSort: js.UndefOr[Boolean] = js.native
 
   var disableSortBy: js.UndefOr[Boolean] = js.native
