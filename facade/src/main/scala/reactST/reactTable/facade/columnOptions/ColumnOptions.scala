@@ -33,6 +33,8 @@ trait ColumnOptions[ // format: off
 
   var Footer: js.UndefOr[Renderer[HeaderProps[D]]] = js.native
 
+  var accessor: js.UndefOr[reactST.reactTable.mod.Accessor[D] | IdType[D]] = js.native
+
   var columns: js.UndefOr[
     js.Array[ColumnOptions[D, js.Any, ColumnType, RowType, CellType, StateType]]
   ] = js.native
@@ -107,20 +109,23 @@ object ColumnOptions {
     RowType,
     CellType[d, v],
     StateType,
-    Self <: ColumnOptions[D, V, ColumnType, RowType, CellType, StateType] // format: on
-  ](val x: Self) // with UseTableColumnOptions[D])
+    ColumnOptsType[d, v, col[d0], row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s]
+    // Self <: ColumnOptions[D, V, ColumnType, RowType, CellType, StateType] // format: on
+  ](val x: ColumnOptsType[D, V, ColumnType, RowType, CellType, StateType])
       extends AnyVal {
+    type Self = ColumnOptsType[D, V, ColumnType, RowType, CellType, StateType]
 
     @scala.inline
-    def setHeader(value: Renderer[HeaderProps[D]]): Self =
-      StObject.set(x, "Header", value.asInstanceOf[js.Any])
+    def setHeader(value: js.UndefOr[Renderer[HeaderProps[D]]]): Self = {
+      x.Header = value
+      x
+    }
 
     @scala.inline
-    def setHeaderUndefined: Self = StObject.set(x, "Header", js.undefined)
-
-    @scala.inline
-    def setHeaderVdomElement(value: VdomElement): Self =
-      StObject.set(x, "Header", value.rawElement.asInstanceOf[js.Any])
+    def setAccessor(value: js.UndefOr[reactST.reactTable.mod.Accessor[D] | IdType[D]]): Self = {
+      x.accessor = value
+      x
+    }
 
     @scala.inline
     def setId(value: IdType[D]): Self = StObject.set(x, "id", value.asInstanceOf[js.Any])

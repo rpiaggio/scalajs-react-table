@@ -12,7 +12,6 @@ trait UseExpandedTableInstance[
   CellType[d, v],
   StateType // format: on
 ] extends TableInstance[D, ColumnType, RowType, CellType, StateType] {
-
   var expandedDepth: Double = js.native
 
   var expandedRowTypes: js.Array[RowType] = js.native

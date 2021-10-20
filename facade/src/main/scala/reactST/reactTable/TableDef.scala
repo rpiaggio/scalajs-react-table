@@ -25,7 +25,7 @@ import reactST.reactTable.mod.UseSortByOptions
 import reactST.reactTable.mod.UseSortByState
 import reactST.reactTable.mod.UseExpandedOptions
 import reactST.reactTable.mod.UseExpandedInstanceProps
-// import reactST.reactTable.mod.UseExpandedRowTypeProps
+import reactST.reactTable.mod.UseExpandedRowProps
 import reactST.reactTable.mod.UseExpandedState
 import reactST.reactTable.mod.SortByFn
 import reactST.reactTable.mod.ColumnInterfaceBasedOnValue
@@ -134,19 +134,22 @@ case class TableDef[ // format: off
    * Create a ColumnOptsD setup up for a simple column with an accessor string.
    */
   def Column[V](accessor: String): Type.ColumnOptions[V] =
+    // reactST.reactTable.facade.columnOptions.ColumnOptions
+    //   .ColumnOptionsMutableBuilder(emptyColumn[V])
+    //   .setAccessor(accessor)
     emptyColumn[V].setAccessor(accessor)
 
   /**
    * Create a ColumnOptsD setup up for a simple column with an accessor function.
    */
   def Column[V](id: String, accessor: D => V): Type.ColumnOptions[V] =
-    emptyColumn[V].setId(id).setAccessorFn(accessor)
+    Column(id, (d, _, _) => accessor(d))
 
   /**
    * Create a ColumnOptsD setup up for a simple column with an accessor function.
    */
   def Column[V](id: String, accessor: (D, Int) => V): Type.ColumnOptions[V] =
-    emptyColumn[V].setId(id).setAccessorFn(accessor)
+    Column(id, (d, index, _) => accessor(d, index))
 
   /**
    * Create a ColumnOptsD setup up for a simple column with an accessor function.
@@ -155,7 +158,17 @@ case class TableDef[ // format: off
     id:       String,
     accessor: (D, Int, Data[D]) => V
   ): Type.ColumnOptions[V] =
-    emptyColumn.setId(id).setAccessorFn(accessor)
+    emptyColumn
+      .setId(id)
+      .setAccessor(
+        (
+          (
+            d:     D,
+            index: Double,
+            sub:   reactST.reactTable.anon.Data[D]
+          ) => accessor(d, index.toInt, sub).asInstanceOf[js.Any]
+        ): js.Function3[D, Double, reactST.reactTable.anon.Data[D], js.Any]
+      )
 
   /**
    * Create a column group with the specified columns in it.
@@ -169,12 +182,12 @@ case class TableDef[ // format: off
     js.Dynamic
       .literal()
       .asInstanceOf[ColumnGroupOptions[D]]
-      .setColumns(cols.toJSArray.asInstanceOf[js.Array[Column[D]]])
+      .setColumns(cols.toJSArray.asInstanceOf[js.Array[reactST.reactTable.mod.Column[D]]])
 
   /**
    * Create an empty instance of type StateType
    */
-  def State(): StateType = js.Dynamic.literal().asInstanceOf[StateType]
+  def State(): StateTypeD = js.Dynamic.literal().asInstanceOf[StateTypeD]
 
   /*
    * When adding new plugins, see https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react-table
@@ -186,22 +199,21 @@ case class TableDef[ // format: off
 
   protected[reactST] def withFeaturePlugin[ // format: off
     NewTableOptsD <: UseTableOptions[D],
-    NewTableInstanceD[d, co, col[d0, co0, RowType0, cell0[d0, v], s0], RowType, cell[d0, v], s] <: 
-      TableInstance[d, co, col, RowType, cell, s],
-    NewColumnOptsD <: ColumnOptions[D],
-    NewColumnType[d, co, RowType, cell[d0, v], s] <: ColumnOptions[d, co, RowType, cell, s],
-    NewRowTypeD <: RowType[D],
+    NewTableInstanceD[d, col[d0], row, cell[d0, v], s] <: TableInstance[d, col, row, cell, s],
+    NewColumnOptsType[d, v, col[d0], row, cell[d0, v], s] <: ColumnOptions[d, v, col, row, cell, s],
+    NewColumnType[d] <: Column[d],
+    NewRowD <: Row[D],
     NewCellType[d, v] <: Cell[d, v],
-    NewStateType <: TableState[D] // format: on
+    NewStateTypeD <: TableState[D] // format: on
   ](plugin: Plugin) =
     TableDef[D,
              NewTableOptsD,
              NewTableInstanceD,
-             NewColumnOptsD,
+             NewColumnOptsType,
              NewColumnType,
-             NewRowTypeD,
+             NewRowD,
              NewCellType,
-             NewStateType,
+             NewStateTypeD,
              Layout
     ](plugins + plugin)
 
@@ -210,12 +222,12 @@ case class TableDef[ // format: off
    */
   def withSort = withFeaturePlugin[
     TableOptsD with UseSortByOptions[D],
-    TableInstanceD with UseExpandedTableInstance,
-    ColumnOptsD with UseSortByColumnOptions[D],
+    TableInstanceType with UseSortByTableInstance,
+    ColumnOptsType with UseSortByColumnOptions,
     ColumnType with UseSortByColumnOptions,
-    RowTypeD,
+    RowD,
     CellType,
-    StateType with UseSortByState[D]
+    StateTypeD with UseSortByState[D]
   ](Plugin.SortBy)
 
   /**
@@ -223,12 +235,12 @@ case class TableDef[ // format: off
    */
   def withExpanded = withFeaturePlugin[
     TableOptsD with UseExpandedOptions[D],
-    TableInstanceD with UseExpandedInstanceProps,
-    ColumnOptsD,
+    TableInstanceType with UseExpandedTableInstance,
+    ColumnOptsType,
     ColumnType,
-    RowTypeD with UseExpandedRowTypeProps[D],
+    RowD with UseExpandedRowProps[D],
     CellType,
-    StateType with UseExpandedState[D]
+    StateTypeD with UseExpandedState[D]
   ](Plugin.Expanded)
 
   // When trying to use a more traditional "syntax" package and implicit
@@ -246,61 +258,42 @@ case class TableDef[ // format: off
         table.setInitialState(s.asInstanceOf[Partial[TableState[D]]])
 
       /**
-       * Sets the RowType id for the RowTypes of the table based on a function.
+       * Sets the row id for the rows of the table based on a function.
        *
        * @param f
-       *   A function from the RowType type to the RowType id.
+       *   A function from the row type to the row id.
        */
-      def setRowTypeIdFn(f: D => String): Self =
-        table.setGetRowTypeId((originalRowType, _, _) => f(originalRowType))
+      def setRowIdFn(f: D => String): Self =
+        table.setGetRowId((originalRow, _, _) => f(originalRow))
 
       /**
-       * Sets the RowType id for the RowTypes of the table based on a function.
+       * Sets the row id for the rows of the table based on a function.
        *
        * @param f
-       *   A function from the RowType type and index to the RowType id.
+       *   A function from the row type and index to the row id.
        */
-      def setRowTypeIdFn(f: (D, Int) => String): Self =
-        table.setGetRowTypeId((originalRowType, relativeIndex, _) =>
-          f(originalRowType, relativeIndex.toInt)
-        )
+      def setRowIdFn(f: (D, Int) => String): Self =
+        table.setGetRowId((originalRow, relativeIndex, _) => f(originalRow, relativeIndex.toInt))
 
       /**
-       * Sets the RowType id for the RowTypes of the table based on a function.
+       * Sets the row id for the rows of the table based on a function.
        *
        * @param f
-       *   A function from the RowType type, index and parent to the RowType id.
+       *   A function from the row type, index and parent to the row id.
        */
-      def setRowTypeIdFn(f: (D, Int, js.UndefOr[RowType[D]]) => String): Self =
-        table.setGetRowTypeId((originalRowType, relativeIndex, parent) =>
-          f(originalRowType, relativeIndex.toInt, parent)
+      def setRowIdFn(f: (D, Int, js.UndefOr[Row[D]]) => String): Self =
+        table.setGetRowId((originalRow, relativeIndex, parent) =>
+          f(originalRow, relativeIndex.toInt, parent)
         )
     }
 
-    implicit class ColumnOptionOps[Self <: ColumnOptsD](val col: Self) {
+    implicit class ColumnOptionOps[Self <: Type.ColumnOptions[_]](val col: Self) {
 
       /**
-       * Sets the accessorFunction for the column.
+       * Sets the sorting for the column based on a function on the row.
        *
        * @param f
-       *   A function from the RowType type to the column type.
-       */
-      def setAccessorFn[V](f: D => V): Self =
-        col.setAccessorFunction3((data, _, _) => f(data).asInstanceOf[js.Any])
-
-      def setAccessorFn[V](f: (D, Int) => V): Self =
-        col.setAccessorFunction3((data, index, _) => f(data, index.toInt).asInstanceOf[js.Any])
-
-      def setAccessorFn[V](f: (D, Int, Data[D]) => V): Self =
-        col.setAccessorFunction3((data, index, sub) =>
-          f(data, index.toInt, sub).asInstanceOf[js.Any]
-        )
-
-      /**
-       * Sets the sorting for the column based on a function on the RowType.
-       *
-       * @param f
-       *   A function from the RowType type to the target type.
+       *   A function from the row type to the target type.
        * @param ordering
        *   An implicit ordering for the target type.
        * @param evidence
