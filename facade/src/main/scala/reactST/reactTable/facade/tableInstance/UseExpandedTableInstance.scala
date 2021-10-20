@@ -5,13 +5,10 @@ import reactST.reactTable.mod.IdType
 import scala.scalajs.js
 
 @js.native
-trait UseExpandedTableInstance[
-  D, // format: off
-  ColumnD,
-  RowD,
-  CellType[d, v],
-  TableStateD // format: on
-] extends TableInstance[D, ColumnD, RowD, CellType, TableStateD] {
+trait UseExpandedTableInstance[D, ColumnD, RowD, CellType[d, col, row], TableStateD]
+    extends js.Object {
+  _: TableInstance[D, ColumnD, RowD, CellType, TableStateD] =>
+
   var expandedDepth: Double = js.native
 
   var expandedRowTypes: js.Array[RowD] = js.native

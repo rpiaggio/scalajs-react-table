@@ -8,9 +8,7 @@ import react.virtuoso.Virtuoso
 import reactST.reactTable.anon.Data
 import reactST.reactTable.mod.ColumnInterfaceBasedOnValue._
 import reactST.reactTable.mod.Row
-import reactST.reactTable.mod.Cell
 import reactST.reactTable.mod.TableState
-// import reactST.reactTable.mod.UseSortByColumnOptions
 import reactST.reactTable.util._
 import reactST.reactTable.syntax._
 import reactST.std.Partial
@@ -51,11 +49,11 @@ object HTMLTable {
   def apply[
     D, // format: off
     TableOptsD <: UseTableOptions[D],
-    TableInstanceType[d, col, row, cell[d0, v0], s] <: TableInstance[d, col, row, cell, s],
-    ColumnOptsType[d, v, col, row, cell[d0, v0], s] <: ColumnOptions[d, v, col, row, cell, s],
+    TableInstanceType[d, col, row, cell[d0, col0, row0], s] <: TableInstance[d, col, row, cell, s],
+    ColumnOptsType[d, col, row, cell[d0, col0, row0], s] <: ColumnOptions[d, col, row, cell, s],
     ColumnD <: Column[D],
     RowD <: Row[D],
-    CellType[d, v] <: Cell[d, v],
+    CellType[d, col, row] <: Cell[d, col, row],
     TableStateD <: TableState[D],
     Layout // format: on
   ](
@@ -137,26 +135,24 @@ object HTMLTable {
   def virtualized[
     D, // format: off
     TableOptsD <: UseTableOptions[D],
-    TableInstanceType[d, col, row, cell[d0, v0], s] <: TableInstance[d, col, row, cell, s],
-    ColumnOptsType[d, v, col, row, cell[d0, v0], s] <: ColumnOptions[d, v, col, row, cell, s],
+    TableInstanceType[d, col, row, cell[d0, col0, row0], s] <: TableInstance[d, col, row, cell, s],
+    ColumnOptsType[d, col, row, cell[d0, col0, row0], s] <: ColumnOptions[d, col, row, cell, s],
     ColumnD <: Column[D],
     RowD <: Row[D],
-    CellType[d, v] <: Cell[d, v],
-    TableStateD <: TableState[D],
-    Self
+    CellType[d, col, row] <: Cell[d, col, row],
+    TableStateD <: TableState[D]
      // format: on
   ](
-    tableDef: Self
-      with TableDef[D,
-                    TableOptsD,
-                    TableInstanceType,
-                    ColumnOptsType,
-                    ColumnD,
-                    RowD,
-                    CellType,
-                    TableStateD,
-                    Layout.NonTable
-      ] // Only used to infer types
+    tableDef: TableDef[D,
+                       TableOptsD,
+                       TableInstanceType,
+                       ColumnOptsType,
+                       ColumnD,
+                       RowD,
+                       CellType,
+                       TableStateD,
+                       Layout.NonTable
+    ] // Only used to infer types
   )(
     bodyHeight:   Option[Double] = None,
     headerCellFn: Option[ColumnD => TagMod],

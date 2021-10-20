@@ -39,7 +39,7 @@ object DemoMain {
   val BaseTable    =
     ScalaFnComponent
       .withHooks[
-        (Reusable[List[BaseTableDef.Type.ColumnOptions[_]]], Reusable[List[Guitar]])
+        (Reusable[List[BaseTableDef.Type.ColumnOptions]], Reusable[List[Guitar]])
       ]
       .useTableBy { case (cols, data) =>
         BaseTableDef(cols, data)
@@ -80,7 +80,7 @@ object DemoMain {
   val SortedTable =
     ScalaFnComponent
       .withHooks[
-        (Reusable[List[SortedTableDef.Type.ColumnOptions[_]]], Reusable[List[Guitar]])
+        (Reusable[List[SortedTableDef.Type.ColumnOptions]], Reusable[List[Guitar]])
       ]
       .useTableBy { case (cols, data) =>
         SortedTableDef(cols, data, Reusable.always(_.setInitialStateFull(sortedTableState)))
@@ -119,9 +119,7 @@ object DemoMain {
   val VirtualizedTable =
     ScalaFnComponent
       .withHooks[
-        (Reusable[List[VirtualizedTableDef.Type.ColumnOptions[_]]],
-         Reusable[List[RandomData.Person]]
-        )
+        (Reusable[List[VirtualizedTableDef.Type.ColumnOptions]], Reusable[List[RandomData.Person]])
       ]
       .useTableBy { case (cols, data) => VirtualizedTableDef(cols, data) }
       .render((_, tableInstance) =>
@@ -146,7 +144,7 @@ object DemoMain {
   val SortedVirtualizedTable =
     ScalaFnComponent
       .withHooks[
-        (Reusable[List[SortedVirtualizedTableDef.Type.ColumnOptions[_]]],
+        (Reusable[List[SortedVirtualizedTableDef.Type.ColumnOptions]],
          Reusable[List[RandomData.Person]]
         )
       ]
@@ -172,8 +170,8 @@ object DemoMain {
 
 // D,
 //      TableOptsD <: UseTableOptions[D],
-//      TableInstanceType[d, col, row, cell[d0, v0], s] <: TableInstance[d, col, row, cell, s],
-//      ColumnOptsType[d, v, col, row, cell[d0, v0], s] <: ColumnOptions[d, v, col, row, cell, s],
+//      TableInstanceType[d, col, row, cell, s] <: TableInstance[d, col, row, cell, s],
+//      ColumnOptsType[d, v, col, row, cell, s] <: ColumnOptions[d, v, col, row, cell, s],
 //      ColumnD <: Column[D],
 //      RowD <: Row[D],
 //      CellType[d, v] <: Cell[d, v],
@@ -183,20 +181,21 @@ object DemoMain {
   val SortedVariableVirtualizedTable =
     ScalaFnComponent
       .withHooks[
-        (Reusable[List[SortedVariableVirtualizedTableDef.Type.ColumnOptions[_]]],
+        (Reusable[List[SortedVariableVirtualizedTableDef.Type.ColumnOptions]],
          Reusable[List[RandomData.Person]]
         )
       ]
-      .useTableBy[RandomData.Person,
-                  SortedVariableVirtualizedTableDef.Type.Options,
-                  SortedVariableVirtualizedTableDef.Type.InstanceC,
-                  SortedVariableVirtualizedTableDef.Type.ColumnOptionsC,
-                  SortedVariableVirtualizedTableDef.Type.Column,
-                  SortedVariableVirtualizedTableDef.Type.Row,
-                  SortedVariableVirtualizedTableDef.Type.CellC,
-                  SortedVariableVirtualizedTableDef.Type.TableState,
-                  Layout.NonTable
-      ] { case (cols, data) => SortedVariableVirtualizedTableDef(cols, data) }
+      // .useTableBy[RandomData.Person,
+      //             SortedVariableVirtualizedTableDef.Type.Options,
+      //             SortedVariableVirtualizedTableDef.Type.InstanceC,
+      //             SortedVariableVirtualizedTableDef.Type.ColumnOptionsC,
+      //             SortedVariableVirtualizedTableDef.Type.Column,
+      //             SortedVariableVirtualizedTableDef.Type.Row,
+      //             SortedVariableVirtualizedTableDef.Type.CellC,
+      //             SortedVariableVirtualizedTableDef.Type.TableState,
+      //             Layout.NonTable
+      // ]
+      .useTableBy { case (cols, data) => SortedVariableVirtualizedTableDef(cols, data) }
       .render((_, tableInstance) =>
         HTMLTable.virtualized(SortedVariableVirtualizedTableDef)(
           tableClass = Css("virtualized"),

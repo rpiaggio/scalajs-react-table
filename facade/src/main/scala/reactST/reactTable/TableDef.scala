@@ -15,7 +15,7 @@ import reactST.reactTable.anon.`1`._
 import reactST.reactTable.mod.ColumnInterfaceBasedOnValue._
 import reactST.reactTable.mod.UseTableOptions
 import reactST.reactTable.mod.Row
-import reactST.reactTable.mod.Cell
+// import reactST.reactTable.mod.Cell
 import reactST.reactTable.mod.TableState
 import reactST.reactTable.mod.ColumnInterface
 import reactST.reactTable.mod.ColumnGroup
@@ -43,11 +43,11 @@ import scalajs.js.JSConverters._
 case class TableDefWithOptions[ // format: off
   D,
   TableOptsD <: UseTableOptions[D],
-  TableInstanceType[d, col, row, cell[d0, v0], s] <: TableInstance[d, col, row, cell, s],
-  ColumnOptsType[d, col, row, cell[d0, v0], s] <: ColumnOptions[d, col, row, cell, s],
+  TableInstanceType[d, col, row, cell[d0, col0, row0], s] <: TableInstance[d, col, row, cell, s],
+  ColumnOptsType[d, col, row, cell[d0, col0, row0], s] <: ColumnOptions[d, col, row, cell, s],
   ColumnD <: Column[D],
   RowD <: Row[D],
-  CellType[d, v] <: Cell[d, v],
+  CellType[d, col, row] <: Cell[d, col, row],
   TableStateD <: TableState[D],
   Layout // format: on
 ](
@@ -70,28 +70,29 @@ case class TableDefWithOptions[ // format: off
 case class TableDef[ // format: off
   D,
   TableOptsD <: UseTableOptions[D],
-  TableInstanceType[d, col, row, cell[d0, v0], s] <: TableInstance[d, col, row, cell, s],
-  ColumnOptsType[d, col, row, cell[d0, v0], s] <: ColumnOptions[d, col, row, cell, s],
+  TableInstanceType[d, col, row, cell[d0, col0, row0], s] <: TableInstance[d, col, row, cell, s],
+  ColumnOptsType[d, col, row, cell[d0, col0, row0], s] <: ColumnOptions[d, col, row, cell, s],
   ColumnD <: Column[D],
   RowD <: Row[D],
-  CellType[d, v] <: Cell[d, v],
+  CellType[d, col, row] <: Cell[d, col, row],
   TableStateD <: TableState[D],
   Layout // format: on
 ](plugins: Set[Plugin]) {
   object Type {
-    type Options                                      = TableOptsD
-    type InstanceC[d, col, row, cell[d0, v0], s]      = TableInstanceType[d, col, row, cell, s]
-    type Instance                                     = InstanceC[D, ColumnD, RowD, CellType, TableStateD]
-    type ColumnOptionsC[d, col, row, cell[d0, v0], s] = ColumnOptsType[d, col, row, cell, s]
-    type ColumnOptions                                = ColumnOptionsC[D, ColumnD, RowD, CellType, TableStateD]
-    // type ColumnOptions[V]                             = ColumnOptionsC[D, V, ColumnD, RowD, CellType, TableStateD]
-    type ColumnGroupOptions                           =
+    type Options                                              = TableOptsD
+    type InstanceC[d, col, row, cell[d0, col0, row0], s]      = TableInstanceType[d, col, row, cell, s]
+    type Instance                                             = InstanceC[D, ColumnD, RowD, CellType, TableStateD]
+    type ColumnOptionsC[d, col, row, cell[d0, col0, row0], s] = ColumnOptsType[d, col, row, cell, s]
+    type ColumnOptions                                        = ColumnOptionsC[D, ColumnD, RowD, CellType, TableStateD]
+    type ColumnValueOptions[V]                                =
+      ColumnOptionsV[D, V, ColumnD, RowD, CellType, TableStateD, ColumnOptions]
+    type ColumnGroupOptions                                   =
       ColumnOptsType[D, ColumnD, RowD, CellType, TableStateD] // TODO Proper col group type
-    type Column      = ColumnD
-    type Row         = RowD
-    type CellC[d, v] = CellType[d, v]
-    type Cell[V]     = CellC[D, V]
-    type TableState  = TableStateD
+    type Column       = ColumnD
+    type Row          = RowD
+    type Cell         = CellType[D, ColumnD, RowD]
+    type CellValue[V] = Cell with reactST.reactTable.facade.cell.CellValue[V]
+    type TableState   = TableStateD
   }
 
   import syntax._
@@ -130,13 +131,19 @@ case class TableDef[ // format: off
    * Create an empty instance of ColumnOptsD. As per react-table's doc: Warning: Only omit accessor
    * if you really know what you're doing.
    */
-  def emptyColumn[V]: Type.ColumnOptions[V] =
-    js.Dynamic.literal().asInstanceOf[Type.ColumnOptions[V]]
+//   def emptyColumn[V]: Type.ColumnOptions[V] =
+//     js.Dynamic.literal().asInstanceOf[Type.ColumnOptions[V]]
+
+// type ColumnValueOptions[d, v, col, row, cell, s, Col <: ColumnOptions[d, col, row, cell, s]] =
+//   Col with facade.columnOptions.ColumnValueOptions[d, v, col, row, cell, s]
+
+  def emptyColumn[V]: Type.ColumnValueOptions[V] =
+    js.Dynamic.literal().asInstanceOf[Type.ColumnValueOptions[V]]
 
   /**
    * Create a ColumnOptsD setup up for a simple column with an accessor string.
    */
-  def Column[V](accessor: String): Type.ColumnOptions[V] =
+  def Column[V](accessor: String): Type.ColumnValueOptions[V] =
     emptyColumn[V].setAccessor(accessor)
 
   /**
@@ -145,13 +152,13 @@ case class TableDef[ // format: off
   def Column[V](
     id:       String,
     accessor: D => V
-  ): Type.ColumnOptions[V] =
+  ): Type.ColumnValueOptions[V] =
     Column(id, (d, _, _) => accessor(d))
 
   /**
    * Create a ColumnOptsD setup up for a simple column with an accessor function.
    */
-  def Column[V](id: String, accessor: (D, Int) => V): Type.ColumnOptions[V] =
+  def Column[V](id: String, accessor: (D, Int) => V): Type.ColumnValueOptions[V] =
     Column(id, (d, index, _) => accessor(d, index))
 
   /**
@@ -160,7 +167,7 @@ case class TableDef[ // format: off
   def Column[V](
     id:       String,
     accessor: (D, Int, Data[D]) => V
-  ): Type.ColumnOptions[V] =
+  ): Type.ColumnValueOptions[V] =
     emptyColumn
       .setId(id)
       .setAccessor(
@@ -182,14 +189,14 @@ case class TableDef[ // format: off
    *   The columns to include in the group.
    */
   def ColumnGroup(
-    cols: (Type.ColumnGroupOptions | Type.ColumnOptions[_])*
+    cols: (Type.ColumnGroupOptions | Type.ColumnOptions)*
   ): Type.ColumnGroupOptions =
     js.Dynamic
       .literal()
       .asInstanceOf[Type.ColumnGroupOptions]
       .setColumns(
         cols.toJSArray
-          .asInstanceOf[js.Array[ColumnOptions[D, _, ColumnD, RowD, CellType, TableStateD]]]
+          .asInstanceOf[js.Array[ColumnOptions[D, ColumnD, RowD, CellType, TableStateD]]]
       )
 
   /**
@@ -207,11 +214,11 @@ case class TableDef[ // format: off
 
   protected[reactST] def withFeaturePlugin[ // format: off
     NewTableOptsD <: UseTableOptions[D],
-    NewTableInstanceD[d, col, row, cell[d0, v0], s] <: TableInstance[d, col, row, cell, s],
-    NewColumnOptsType[d, v, col, row, cell[d0, v0], s] <: ColumnOptions[d, v, col, row, cell, s],
+    NewTableInstanceD[d, col, row, cell[d0, col0, row0], s] <: TableInstance[d, col, row, cell, s],
+    NewColumnOptsType[d, col, row, cell[d0, col0, row0], s] <: ColumnOptions[d, col, row, cell, s],
     NewColumnD <: Column[D],
     NewRowD <: Row[D],
-    NewCellType[d, v] <: Cell[d, v],
+    NewCellType[d, col, row] <: Cell[d, col, row],
     NewTableStateD <: TableState[D] // format: on
   ](plugin: Plugin) =
     TableDef[D,
@@ -295,7 +302,7 @@ case class TableDef[ // format: off
         )
     }
 
-    implicit class ColumnOptionOps[Self <: Type.ColumnOptions[_]](val col: Self) {
+    implicit class ColumnOptionOps[Self <: Type.ColumnOptions](val col: Self) {
 
       /**
        * Sets the sorting for the column based on a function on the row.
@@ -355,11 +362,11 @@ object TableDef {
   implicit class TableLayoutTableDefOps[ // format: off
     D,
     TableOptsD <: UseTableOptions[D],
-    TableInstanceType[d, col, row, cell[d0, v0], s] <: TableInstance[d, col, row, cell, s],
-    ColumnOptsType[d, v, col, row, cell[d0, v0], s] <: ColumnOptions[d, v, col, row, cell, s],
+    TableInstanceType[d, col, row, cell[d0, col0, row0], s] <: TableInstance[d, col, row, cell, s],
+    ColumnOptsType[d, col, row, cell[d0, col0, row0], s] <: ColumnOptions[d, col, row, cell, s],
     ColumnD <: Column[D],
     RowD <: Row[D],
-    CellType[d, v] <: Cell[d, v],
+    CellType[d, col, row] <: Cell[d, col, row],
     TableStateD <: TableState[D],
   ](
     val tableDef: TableDef[
@@ -375,11 +382,11 @@ object TableDef {
   ]) extends AnyVal { 
     private def withLayoutPlugin[
       NewTableOptsD <: UseTableOptions[D],
-      NewTableInstanceType[d, col, row, cell[d0, v0], s] <: TableInstance[d, col, row, cell, s],
-      NewColumnOptsType[d, v, col, row, cell[d0, v0], s] <: ColumnOptions[d, v, col, row, cell, s],
+      NewTableInstanceType[d, col, row, cell[d0, col0, row0], s] <: TableInstance[d, col, row, cell, s],
+      NewColumnOptsType[d, col, row, cell[d0, col0, row0], s] <: ColumnOptions[d, col, row, cell, s],
       NewColumnD <: Column[D],
       NewRowD <: Row[D],
-      NewCellType[d, v] <: Cell[d, v],
+      NewCellType[d, col, row] <: Cell[d, col, row],
       NewTableStateD <: TableState[D] // format: on
     ](plugin: Plugin) =
       TableDef[D,
@@ -433,11 +440,11 @@ object TableDef {
   implicit class NonTableLayoutTableDefOps[ // format: off
     D, 
     TableOptsD <: UseTableOptions[D],
-    TableInstanceType[d, col, row, cell[d0, v0], s] <: TableInstance[d, col, row, cell, s],
-    ColumnOptsType[d, v, col, row, cell[d0, v0], s] <: ColumnOptions[d, v, col, row, cell, s],
+    TableInstanceType[d, col, row, cell[d0, col0, row0], s] <: TableInstance[d, col, row, cell, s],
+    ColumnOptsType[d, col, row, cell[d0, col0, row0], s] <: ColumnOptions[d, col, row, cell, s],
     ColumnD <: Column[D],
     RowD <: Row[D],
-    CellType[d, v] <: Cell[d, v],
+    CellType[d, col, row] <: Cell[d, col, row],
     TableStateD <: TableState[D] // format: on
   ](
     val tableDef: TableDef[

@@ -12,13 +12,7 @@ import scalajs.js
 // to add specific typing. Ideally we would extend and override, but we
 // cannot override vars in Scala (and everything's a var in the generated code).
 @js.native
-trait TableInstance[
-  D, // format: off
-  ColumnD,
-  RowD,
-  CellType[d, v],
-  TableStateD // format: on
-] extends js.Object {
+trait TableInstance[D, ColumnD, RowD, CellType[d, col, row], TableStateD] extends js.Object {
   val allColumns: js.Array[ColumnD] = js.native
 
   val allColumnsHidden: Boolean = js.native

@@ -8,13 +8,10 @@ import reactST.reactTable.mod.SortByFn
 import reactST.reactTable.mod.DefaultSortTypes
 
 @js.native
-trait UseSortByColumnOptions[ // format: off
-  D,
-  ColumnD,
-  RowD,
-  CellType[d, v],
-  TableStateD // format: on
-] extends ColumnOptions[D, ColumnD, RowD, CellType, TableStateD] {
+trait UseSortByColumnOptions[D, ColumnD, RowD, CellType[d, col, row], TableStateD]
+    extends js.Object {
+  _: ColumnOptions[D, ColumnD, RowD, CellType, TableStateD] =>
+
   var defaultCanSort: js.UndefOr[Boolean] = js.native
 
   var disableSortBy: js.UndefOr[Boolean] = js.native
@@ -28,45 +25,42 @@ trait UseSortByColumnOptions[ // format: off
 
 object UseSortByColumnOptions {
 
-  implicit class ColumnOptionsMutableBuilder[
-    D, // format: off
-    ColumnD,
-    RowD,
-    CellType[d, v],
-    TableStateD,
-    Self
-  ](val colOpts: Self with UseSortByColumnOptions[D,  ColumnD, RowD, CellType, TableStateD])
-      extends AnyVal {
+  // format: off
+  implicit class ColumnOptionsMutableBuilder[D, V, ColumnD, RowD, CellType[d, col, row], TableStateD, Self]( // format: on
+    val colOpts: Self
+      with UseSortByColumnOptions[D, ColumnD, RowD, CellType, TableStateD]
+      with ColumnValueOptions[D, V, ColumnD, RowD, CellType, TableStateD]
+  ) extends AnyVal {
 
-    // /**
-    //  * Sets the sorting for the column based on a function on its value.
-    //  *
-    //  * @param f
-    //  *   A function from the value type to the target type.
-    //  * @param ordering
-    //  *   An implicit ordering for the target type.
-    //  * @param evidence
-    //  *   Evidence that this column is sortable.
-    //  */
-    // def setSortByFn[U](f: V => U)(implicit ordering: Ordering[U]): Self = {
-    //   val sbfn: SortByFn[D] = (d1, d2, col, _) =>
-    //     ordering
-    //       .compare(f(d1.values(col.asInstanceOf[String]).asInstanceOf[V]),
-    //                f(d2.values(col.asInstanceOf[String]).asInstanceOf[V])
-    //       )
-    //       .toDouble
-    //   colOpts.setSortType(sbfn).asInstanceOf[Self]
-    // }
+    /**
+     * Sets the sorting for the column based on a function on its value.
+     *
+     * @param f
+     *   A function from the value type to the target type.
+     * @param ordering
+     *   An implicit ordering for the target type.
+     * @param evidence
+     *   Evidence that this column is sortable.
+     */
+    def setSortByFn[U](f: V => U)(implicit ordering: Ordering[U]): Self = {
+      val sbfn: SortByFn[D] = (d1, d2, col, _) =>
+        ordering
+          .compare(f(d1.values(col.asInstanceOf[String]).asInstanceOf[V]),
+                   f(d2.values(col.asInstanceOf[String]).asInstanceOf[V])
+          )
+          .toDouble
+      colOpts.setSortType(sbfn).asInstanceOf[Self]
+    }
 
-    // /**
-    //  * Sets the sorting for the column based on its value.
-    //  *
-    //  * @param ordering
-    //  *   An implicit ordering for the value type.
-    //  * @param evidence
-    //  *   Evidence that this column is sortable.
-    //  */
-    // def setSortByAuto(implicit ordering: Ordering[V]): Self = setSortByFn(identity)
+    /**
+     * Sets the sorting for the column based on its value.
+     *
+     * @param ordering
+     *   An implicit ordering for the value type.
+     * @param evidence
+     *   Evidence that this column is sortable.
+     */
+    def setSortByAuto(implicit ordering: Ordering[V]): Self = setSortByFn(identity)
 
     // @scala.inline
     // implicit class UseSortByColumnOptionsMutableBuilder[Self <: UseSortByColumnOptions[

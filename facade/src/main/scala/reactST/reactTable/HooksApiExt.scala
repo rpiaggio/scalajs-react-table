@@ -3,7 +3,6 @@ package reactST.reactTable
 import japgolly.scalajs.react._
 import reactST.reactTable._
 import reactST.reactTable.mod.Row
-import reactST.reactTable.mod.Cell
 import reactST.reactTable.mod.TableState
 import reactST.reactTable.mod.UseTableOptions
 
@@ -13,15 +12,15 @@ object HooksApiExt {
   sealed class Primary[Ctx, Step <: HooksApi.AbstractStep](api: HooksApi.Primary[Ctx, Step]) {
 
     final def useTable[
-      D,
+      D, // format: off
       TableOptsD <: UseTableOptions[D],
-      TableInstanceType[d, col, row, cell[d0, v0], s] <: TableInstance[d, col, row, cell, s],
-      ColumnOptsType[d, v, col, row, cell[d0, v0], s] <: ColumnOptions[d, v, col, row, cell, s],
+      TableInstanceType[d, col, row, cell[d0, col0, row0], s] <: TableInstance[d, col, row, cell, s],
+      ColumnOptsType[d, col, row, cell[d0, col0, row0], s] <: ColumnOptions[d, col, row, cell, s],
       ColumnD <: Column[D],
       RowD <: Row[D],
-      CellType[d, v] <: Cell[d, v],
+      CellType[d, col, row] <: Cell[d, col, row],
       TableStateD <: TableState[D],
-      Layout
+      Layout // format: on
     ](
       tableDefWithOptions: TableDefWithOptions[
         D,
@@ -42,15 +41,15 @@ object HooksApiExt {
       useTableBy(_ => tableDefWithOptions)
 
     final def useTableBy[
-      D,
+      D, // format: off
       TableOptsD <: UseTableOptions[D],
-      TableInstanceType[d, col, row, cell[d0, v0], s] <: TableInstance[d, col, row, cell, s],
-      ColumnOptsType[d, v, col, row, cell[d0, v0], s] <: ColumnOptions[d, v, col, row, cell, s],
+      TableInstanceType[d, col, row, cell[d0, col0, row0], s] <: TableInstance[d, col, row, cell, s],
+      ColumnOptsType[d, col, row, cell[d0, col0, row0], s] <: ColumnOptions[d, col, row, cell, s],
       ColumnD <: Column[D],
       RowD <: Row[D],
-      CellType[d, v] <: Cell[d, v],
+      CellType[d, col, row] <: Cell[d, col, row],
       TableStateD <: TableState[D],
-      Layout
+      Layout // format: on
     ](
       tableDefWithOptions: Ctx => TableDefWithOptions[
         D,
@@ -76,15 +75,15 @@ object HooksApiExt {
   ) extends Primary[Ctx, Step](api) {
 
     def useTableBy[
-      D,
+      D, // format: off
       TableOptsD <: UseTableOptions[D],
-      TableInstanceType[d, col, row, cell[d0, v0], s] <: TableInstance[d, col, row, cell, s],
-      ColumnOptsType[d, v, col, row, cell[d0, v0], s] <: ColumnOptions[d, v, col, row, cell, s],
+      TableInstanceType[d, col, row, cell[d0, col0, row0], s] <: TableInstance[d, col, row, cell, s],
+      ColumnOptsType[d, col, row, cell[d0, col0, row0], s] <: ColumnOptions[d, col, row, cell, s],
       ColumnD <: Column[D],
       RowD <: Row[D],
-      CellType[d, v] <: Cell[d, v],
+      CellType[d, col, row] <: Cell[d, col, row],
       TableStateD <: TableState[D],
-      Layout
+      Layout // format: on
     ](
       tableDefWithOptions: CtxFn[TableDefWithOptions[
         D,
