@@ -44,7 +44,7 @@ case class TableDefWithOptions[ // format: off
   D,
   TableOptsD <: UseTableOptions[D],
   TableInstanceType[d, col, row, cell[d0, v0], s] <: TableInstance[d, col, row, cell, s],
-  ColumnOptsType[d, v, col, row, cell[d0, v0], s] <: ColumnOptions[d, v, col, row, cell, s],
+  ColumnOptsType[d, col, row, cell[d0, v0], s] <: ColumnOptions[d, col, row, cell, s],
   ColumnD <: Column[D],
   RowD <: Row[D],
   CellType[d, v] <: Cell[d, v],
@@ -62,7 +62,7 @@ case class TableDefWithOptions[ // format: off
     TableStateD,
     Layout
   ],
-  cols:     Reusable[List[ColumnOptsType[D, _, ColumnD, RowD, CellType, TableStateD]]],
+  cols:     Reusable[List[ColumnOptsType[D, ColumnD, RowD, CellType, TableStateD]]],
   data:     Reusable[List[D]],
   modOpts:  Reusable[TableOptsD => TableOptsD]
 )
@@ -71,7 +71,7 @@ case class TableDef[ // format: off
   D,
   TableOptsD <: UseTableOptions[D],
   TableInstanceType[d, col, row, cell[d0, v0], s] <: TableInstance[d, col, row, cell, s],
-  ColumnOptsType[d, v, col, row, cell[d0, v0], s] <: ColumnOptions[d, v, col, row, cell, s],
+  ColumnOptsType[d, col, row, cell[d0, v0], s] <: ColumnOptions[d, col, row, cell, s],
   ColumnD <: Column[D],
   RowD <: Row[D],
   CellType[d, v] <: Cell[d, v],
@@ -79,13 +79,14 @@ case class TableDef[ // format: off
   Layout // format: on
 ](plugins: Set[Plugin]) {
   object Type {
-    type Options                                         = TableOptsD
-    type InstanceC[d, col, row, cell[d0, v0], s]         = TableInstanceType[d, col, row, cell, s]
-    type Instance                                        = InstanceC[D, ColumnD, RowD, CellType, TableStateD]
-    type ColumnOptionsC[d, v, col, row, cell[d0, v0], s] = ColumnOptsType[d, v, col, row, cell, s]
-    type ColumnOptions[V]                                = ColumnOptionsC[D, V, ColumnD, RowD, CellType, TableStateD]
-    type ColumnGroupOptions                              =
-      ColumnOptsType[D, _, ColumnD, RowD, CellType, TableStateD] // TODO Proper col group type
+    type Options                                      = TableOptsD
+    type InstanceC[d, col, row, cell[d0, v0], s]      = TableInstanceType[d, col, row, cell, s]
+    type Instance                                     = InstanceC[D, ColumnD, RowD, CellType, TableStateD]
+    type ColumnOptionsC[d, col, row, cell[d0, v0], s] = ColumnOptsType[d, col, row, cell, s]
+    type ColumnOptions                                = ColumnOptionsC[D, ColumnD, RowD, CellType, TableStateD]
+    // type ColumnOptions[V]                             = ColumnOptionsC[D, V, ColumnD, RowD, CellType, TableStateD]
+    type ColumnGroupOptions                           =
+      ColumnOptsType[D, ColumnD, RowD, CellType, TableStateD] // TODO Proper col group type
     type Column      = ColumnD
     type Row         = RowD
     type CellC[d, v] = CellType[d, v]
@@ -96,7 +97,7 @@ case class TableDef[ // format: off
   import syntax._
 
   def apply(
-    cols:    Reusable[List[Type.ColumnOptions[_]]],
+    cols:    Reusable[List[Type.ColumnOptions]],
     data:    Reusable[List[D]],
     modOpts: Reusable[TableOptsD => TableOptsD] = Reusable.always(identity[TableOptsD] _)
   ): TableDefWithOptions[
@@ -118,7 +119,7 @@ case class TableDef[ // format: off
    * Create a TableOptsD. columns and data are required. Other options can be `set*`.
    */
   protected[reactTable] def Options(
-    columns: js.Array[Type.ColumnOptions[_]],
+    columns: js.Array[Type.ColumnOptions],
     data:    js.Array[D]
   ): TableOptsD =
     emptyOptions

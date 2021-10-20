@@ -8,12 +8,11 @@ import scala.scalajs.js.annotation.{ JSBracketAccess, JSGlobal, JSGlobalScope, J
 @js.native
 trait UseResizeColumnsColumnOptions[ // format: off
   D,
-  V,
   ColumnD,
   RowType,
   CellType[d, v],
   StateType // format: on
-] extends ColumnOptions[D, V, ColumnD, RowType, CellType, StateType] {
+] extends ColumnOptions[D, ColumnD, RowType, CellType, StateType] {
   var disableResizing: js.UndefOr[Boolean] = js.native
 }
 
@@ -27,11 +26,11 @@ object UseResizeColumnsColumnOptions {
     RowD,
     CellType[d, v],
     TableStateD,
-    ColumnOptsType[d, v, col, row, cell[d0, v0], s] <: 
-      UseResizeColumnsColumnOptions[d, v, col, row, cell, s] // format: on
-  ](val x: ColumnOptsType[D, V, ColumnD, RowD, CellType, TableStateD])
+    ColumnOptsType[d, col, row, cell[d0, v0], s] <: 
+      UseResizeColumnsColumnOptions[d, col, row, cell, s] // format: on
+  ](val x: ColumnOptsType[D, ColumnD, RowD, CellType, TableStateD])
       extends AnyVal {
-    type Self = ColumnOptsType[D, V, ColumnD, RowD, CellType, TableStateD]
+    type Self = ColumnOptsType[D, ColumnD, RowD, CellType, TableStateD]
 
     @scala.inline
     def setDisableResizing(value: js.UndefOr[Boolean]): Self = {
